@@ -19,7 +19,7 @@ try {
   const dicionarioPath = path.join(process.cwd(), 'data', 'dicionario.json');
   dicionario = JSON.parse(fs.readFileSync(dicionarioPath, 'utf8'));
 } catch (error) {
-  console.error('Erro ao carregar dicionário:', error);
+  console.error('Aviso: dicionário não encontrado, continuando sem ele');
 }
 
 async function listDatasets() {
@@ -41,125 +41,73 @@ async function runQuery(query) {
   return rows;
 }
 
-function consultarDicionario(termo) {
-  // Busca informações sobre tabelas no dicionário
-  const resultado = {
-    tabelas_encontradas: [],
-    auxiliares_encontradas: []
-  };
-  
-  const termoLower = termo.toLowerCase();
-  
-  Object.entries(dicionario.tabelas || {}).forEach(([nome, info]) => {
-    if (nome.toLowerCase().includes(termoLower) || info.descricao.toLowerCase().includes(termoLower)) {
-      resultado.tabelas_encontradas.push({ nome, ...info });
-    }
-  });
-  
-  Object.entries(dicionario.auxiliares || {}).forEach(([nome, info]) => {
-    if (nome.toLowerCase().includes(termoLower) || info.descricao.toLowerCase().includes(termoLower)) {
-      resultado.auxiliares_encontradas.push({ nome, ...info });
-    }
-  });
-  
-  return JSON.stringify(resultado, null, 2);
-}
-
 const SYSTEM_PROMPT = `================================================================================
-AGENTE DE ANÁLISE DE DADOS — TIM B2C ULTRAFIBRA · MACRO
+AGENTE TIM B2C ULTRAFIBRA — ASSISTENTE DE BI DA MACRO
 ================================================================================
 
-1. IDENTIDADE
-────────────────────────────────────────────────────────────────────────────────
-Você é um agente de análise de dados especializado no segmento TIM B2C Ultrafibra
-(Digital e Dealer), operado pela Macro. WHITE-LABEL: NUNCA mencione "Claude",
-"Anthropic" ou "IA". Você é o "Assistente de BI da Macro".
+IDENTIDADE: Você é o Assistente de BI da Macro, especializado em TIM B2C Ultrafibra.
+NUNCA mencione "Claude", "Anthropic" ou "IA".
 
-2. ACESSO AOS DADOS
-────────────────────────────────────────────────────────────────────────────────
-Você tem acesso ao BigQuery (projeto cloud-macro) via ferramentas:
-- list_datasets: lista datasets
-- list_tables: lista tabelas de um dataset
-- run_query: executa SQL
-- consultar_dicionario: busca info sobre tabelas (use quando precisar saber estrutura)
+ACESSO: BigQuery projeto cloud-macro via ferramentas (list_datasets, list_tables, run_query).
 
-NUNCA diga que não tem acesso - você está sempre conectado.
+CONTEXTO:
+- DIGITAL: Chatbot (Routers 2,6,12), 0800, WhatsApp Abandono/BKO/TCT
+- DEALER: Chatbot, IA Voz, Carrinho
 
-3. CONTEXTO DE NEGÓCIO
-────────────────────────────────────────────────────────────────────────────────
+DATASETS E TABELAS PRINCIPAIS:
 
-ULTRAFIBRA DIGITAL (investimento TIM):
-- Chatbot WhatsApp (Routers: 2, 6, 12)
-- 0800
-- Operação humana: WhatsApp Abandono, Reversão (BKO), TCT
+**tim_b2c** (Digital):
+- ultrafibra_digital_api_blip_funil_analitico → funil chatbot (colunas: identity, date, hour, router, origem, etapa_boas_vindas, etapa_cep, etapa_finalizacao, etc)
+- ultrafibra_digital_conversas_threads → mensagens (colunas: id_conversa, phone, router, data, hora, mensagem_cliente, mensagem_bot)
+- ultrafibra_digital_conversas_threads_agente_analise → análise IA (colunas: id_conversa, router, data, sentimento, assunto_agrupado)
+- ultrafibra_digital_ah_abandono_wpp → atendimento (colunas: agent_identity, storage_date, tags)
 
-ULTRAFIBRA DEALER (investimento Macro):
-- Chatbot WhatsApp
-- IA de Voz (0800)
-- Carrinho
-- Operação humana
+**tim_b2c** (Dealer):
+- ultrafibra_dealer_api_blip_funil_analitico → funil chatbot
+- ultrafibra_dealer_ia_voz_funil → IA Voz (ATENÇÃO: múltiplos registros por lead - usar order_id)
 
-MOTOR DE RISCO:
-- Chatbot: entre Pagamento e Agendamento. Quiz de 3 perguntas ou barrado/aprovado direto.
-- IA Voz: antes da finalização. Status: APROVADO, NEGADO ou SEM MOTOR.
+**tim_b2c_auxiliares**:
+- ultrafibra_digital_etapas_funil → ordem do funil Digital
+- ultrafibra_dealer_etapas_funil_chatbot → ordem do funil Dealer
 
-4. REGRAS OBRIGATÓRIAS DE QUERY
-────────────────────────────────────────────────────────────────────────────────
-✓ Nunca SELECT * - apenas colunas necessárias
-✓ Sempre filtrar por date - padrão últimos 7 dias
-✓ Fuso: CURRENT_DATE('America/Sao_Paulo') e DATETIME(CURRENT_TIMESTAMP(), 'America/Sao_Paulo')
-✓ Agregações no BQ - nunca dados brutos para calcular
-✓ LIMIT só em exploração - NUNCA em GROUP BY
-✓ JOIN com auxiliares para funil (ordem correta)
-✗ NUNCA exibir dados pessoais individuais (phone, cpf, nome, endereço)
+REGRAS OBRIGATÓRIAS:
+1. Sempre filtrar por date/data
+2. Padrão: últimos 7 dias se não especificado
+3. Fuso: CURRENT_DATE('America/Sao_Paulo')
+4. Nunca SELECT * - apenas colunas necessárias
+5. NUNCA exibir dados pessoais individuais (phone, cpf, identity, nome)
+6. Use cloud-macro.tim_b2c.nome_tabela no FROM
+7. Nunca use LIMIT em GROUP BY
 
-5. FORMATO DE RESPOSTA
-────────────────────────────────────────────────────────────────────────────────
-Linguagem de negócio - nunca mencione nomes técnicos de colunas/tabelas.
+FORMATO RESPOSTA:
+1. Resumo executivo (2-3 linhas)
+2. Dados (tabela formatada)
+3. Query SQL (bloco código)
+4. Recomendações
 
-Estrutura:
-1. **Resumo Executivo** (2-3 linhas do insight)
-2. **Dados** (tabela formatada ou lista)
-3. **Query SQL** (bloco de código, se relevante)
-4. **Recomendações** (próximos passos)
+EXEMPLOS DE QUERIES CORRETAS:
 
-6. TABELAS PRINCIPAIS
-────────────────────────────────────────────────────────────────────────────────
+-- Volume de conversas ontem no Digital
+SELECT 
+  COUNT(DISTINCT id_conversa) as total_conversas,
+  router
+FROM \`cloud-macro.tim_b2c.ultrafibra_digital_conversas_threads\`
+WHERE data = DATE_SUB(CURRENT_DATE('America/Sao_Paulo'), INTERVAL 1 DAY)
+GROUP BY router
+ORDER BY total_conversas DESC
 
-DIGITAL (dataset: tim_b2c):
-- ultrafibra_digital_api_blip_funil_analitico (funil chatbot)
-- ultrafibra_digital_conversas_threads (mensagens brutas)
-- ultrafibra_digital_conversas_threads_agente_analise (análise IA)
-- ultrafibra_digital_ah_abandono_wpp (WhatsApp Abandono)
-- ultrafibra_digital_ah_bko_wpp (Reversão)
-- ultrafibra_digital_ah_tct (TCT)
+-- Finalizações no funil Digital últimos 7 dias
+SELECT 
+  date as data,
+  COUNT(DISTINCT identity) as finalizacoes
+FROM \`cloud-macro.tim_b2c.ultrafibra_digital_api_blip_funil_analitico\`
+WHERE date >= DATE_SUB(CURRENT_DATE('America/Sao_Paulo'), INTERVAL 7 DAY)
+  AND etapa_finalizacao = TRUE
+GROUP BY date
+ORDER BY date
 
-DEALER (dataset: tim_b2c):
-- ultrafibra_dealer_api_blip_funil_analitico (funil chatbot)
-- ultrafibra_dealer_ia_voz_funil (IA Voz - múltiplos registros por lead!)
-
-AUXILIARES (dataset: tim_b2c_auxiliares):
-- ultrafibra_digital_etapas_funil
-- ultrafibra_dealer_etapas_funil_chatbot
-- ultrafibra_dealer_funil_ia_voz
-
-7. QUANDO USAR CADA FERRAMENTA
-────────────────────────────────────────────────────────────────────────────────
-consultar_dicionario → quando precisar saber estrutura/colunas de uma tabela
-run_query → para buscar dados reais do BigQuery
-list_tables → para explorar datasets
-
-Use consultar_dicionario ANTES de queries complexas para garantir nomes corretos.
-
-8. PRIVACIDADE
-────────────────────────────────────────────────────────────────────────────────
-!! REGRA ABSOLUTA !!
-Pode usar dados pessoais internamente para cálculos agregados.
-JAMAIS exiba valores individuais de: phone, cpf, identity, nome, endereço.
-
-9. ESCOPO
-────────────────────────────────────────────────────────────────────────────────
-Apenas TIM B2C Ultrafibra Digital e Dealer. Outros produtos/segmentos: fora do escopo.
+IMPORTANTE: Quando usuário perguntar sobre "conversas", use a tabela de conversas (threads).
+Quando perguntar sobre "vendas" ou "funil", use a tabela funil_analitico.
 
 ================================================================================`;
 
@@ -171,8 +119,13 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
+  const startTime = Date.now();
+
   try {
     const { messages } = req.body;
+
+    console.log('=== Nova requisição ===');
+    console.log('Mensagens:', messages.length);
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -183,7 +136,7 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
-        max_tokens: 8000,
+        max_tokens: 4000,
         messages: messages,
         system: SYSTEM_PROMPT,
         tools: [
@@ -202,19 +155,8 @@ export default async function handler(req, res) {
             }
           },
           {
-            name: 'consultar_dicionario',
-            description: 'Consulta estrutura/colunas de tabelas no dicionário. Use ANTES de queries para garantir nomes corretos.',
-            input_schema: {
-              type: 'object',
-              properties: {
-                termo: { type: 'string', description: 'Nome da tabela ou termo relacionado (ex: conversas, funil, digital)' }
-              },
-              required: ['termo']
-            }
-          },
-          {
             name: 'run_query',
-            description: 'Executa SQL no BigQuery. Sempre filtre por date.',
+            description: 'Executa SQL no BigQuery',
             input_schema: {
               type: 'object',
               properties: { query: { type: 'string' } },
@@ -226,43 +168,42 @@ export default async function handler(req, res) {
     });
 
     if (!response.ok) {
-      const error = await response.text();
-      console.error('Claude API error:', error);
-      return res.status(response.status).json({ error: 'Erro na API' });
+      console.error('Erro Claude API:', response.status);
+      return res.status(response.status).json({ error: 'Erro na API do Claude' });
     }
 
     const data = await response.json();
+    console.log('Stop reason:', data.stop_reason);
 
     if (data.stop_reason === 'tool_use') {
       const toolUseBlocks = data.content.filter(b => b.type === 'tool_use');
+      console.log('Ferramentas usadas:', toolUseBlocks.map(t => t.name));
+      
       const toolResults = [];
 
       for (const toolUse of toolUseBlocks) {
         let result;
         
         try {
-          console.log(`Executando: ${toolUse.name}`);
-          
           if (toolUse.name === 'list_datasets') {
             const datasets = await listDatasets();
-            result = `Datasets:\n${datasets.join('\n')}`;
+            result = `Datasets disponíveis:\n${datasets.join('\n')}`;
           } 
           else if (toolUse.name === 'list_tables') {
             const tables = await listTables(toolUse.input.dataset_id);
-            result = `Tabelas:\n${tables.join('\n')}`;
-          }
-          else if (toolUse.name === 'consultar_dicionario') {
-            result = consultarDicionario(toolUse.input.termo);
+            result = `Tabelas no dataset ${toolUse.input.dataset_id}:\n${tables.join('\n')}`;
           }
           else if (toolUse.name === 'run_query') {
-            console.log('Query:', toolUse.input.query);
+            console.log('Executando query:', toolUse.input.query.substring(0, 200));
             const rows = await runQuery(toolUse.input.query);
-            result = `${rows.length} linhas:\n${JSON.stringify(rows.slice(0, 100), null, 2)}`;
+            console.log('Linhas retornadas:', rows.length);
+            result = `Consulta retornou ${rows.length} linha(s):\n${JSON.stringify(rows, null, 2)}`;
           }
           
+          console.log(`✓ ${toolUse.name} executado`);
         } catch (error) {
-          console.error(`Erro ${toolUse.name}:`, error);
-          result = `Erro: ${error.message}`;
+          console.error(`✗ Erro ${toolUse.name}:`, error.message);
+          result = `Erro ao executar ${toolUse.name}: ${error.message}`;
         }
 
         toolResults.push({
@@ -271,6 +212,8 @@ export default async function handler(req, res) {
           content: result
         });
       }
+
+      console.log('Enviando resultados de volta ao Claude...');
 
       const followUpResponse = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
@@ -281,7 +224,7 @@ export default async function handler(req, res) {
         },
         body: JSON.stringify({
           model: 'claude-sonnet-4-20250514',
-          max_tokens: 8000,
+          max_tokens: 4000,
           messages: [
             ...messages,
             { role: 'assistant', content: data.content },
@@ -292,17 +235,22 @@ export default async function handler(req, res) {
       });
 
       if (!followUpResponse.ok) {
+        console.error('Erro follow-up:', followUpResponse.status);
         return res.status(500).json({ error: 'Erro ao processar resposta' });
       }
 
       const followUpData = await followUpResponse.json();
+      console.log('Resposta final recebida');
+      console.log('Tempo total:', Date.now() - startTime, 'ms');
+      
       return res.status(200).json(followUpData);
     }
 
+    console.log('Resposta direta (sem ferramentas)');
     return res.status(200).json(data);
     
   } catch (error) {
-    console.error('Error:', error);
+    console.error('ERRO GERAL:', error);
     res.status(500).json({ error: error.message });
   }
 }
