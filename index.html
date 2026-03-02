@@ -1,15 +1,14 @@
 // ========================================
-// ARQUIVO 2: index.html
+// ARQUIVO 2: index.html (ATUALIZADO - Visual Macro)
 // ========================================
-// Interface do usuário
-// Salve como: index.html
+// Substitua o index.html
 
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Macro BI Assistant</title>
+    <title>Assistente de BI · Macro</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 min-h-screen">
@@ -18,14 +17,14 @@
         <div class="max-w-7xl mx-auto px-6 py-4">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-lg flex items-center justify-center">
                         <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
                         </svg>
                     </div>
                     <div>
-                        <h1 class="text-xl font-bold text-white">Macro BI Assistant</h1>
-                        <p class="text-xs text-slate-400">Powered by Advanced Analytics</p>
+                        <h1 class="text-xl font-bold text-white">Assistente de BI</h1>
+                        <p class="text-xs text-slate-400">TIM B2C Ultrafibra · Macro</p>
                     </div>
                 </div>
                 <div class="flex items-center gap-2 text-xs text-slate-400">
@@ -45,8 +44,29 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"></path>
                         </svg>
                     </div>
-                    <h2 class="text-2xl font-bold text-white mb-3">Bem-vindo ao Assistente de BI da Macro</h2>
-                    <p class="text-slate-400 mb-8 max-w-md">Faça perguntas sobre seus dados em linguagem natural</p>
+                    <h2 class="text-2xl font-bold text-white mb-3">Assistente de BI da Macro</h2>
+                    <p class="text-slate-400 mb-8 max-w-md">
+                        Especializado em TIM B2C Ultrafibra Digital e Dealer<br>
+                        Faça perguntas sobre dados de vendas, funil, conversas e operações
+                    </p>
+                    <div class="grid grid-cols-2 gap-3 w-full max-w-2xl text-left">
+                        <button onclick="setQuestion('Quais datasets temos disponíveis?')" class="p-4 bg-slate-700/30 hover:bg-slate-700/50 border border-slate-600/30 rounded-xl transition-all">
+                            <div class="text-sm font-medium text-white">Explorar Dados</div>
+                            <div class="text-xs text-slate-400 mt-1">Ver datasets e tabelas</div>
+                        </button>
+                        <button onclick="setQuestion('Quantas conversas tivemos ontem no Router 6?')" class="p-4 bg-slate-700/30 hover:bg-slate-700/50 border border-slate-600/30 rounded-xl transition-all">
+                            <div class="text-sm font-medium text-white">Volume de Conversas</div>
+                            <div class="text-xs text-slate-400 mt-1">Digital - por Router</div>
+                        </button>
+                        <button onclick="setQuestion('Onde temos mais abandono no funil do Chatbot Dealer?')" class="p-4 bg-slate-700/30 hover:bg-slate-700/50 border border-slate-600/30 rounded-xl transition-all">
+                            <div class="text-sm font-medium text-white">Análise de Abandono</div>
+                            <div class="text-xs text-slate-400 mt-1">Dealer - Chatbot</div>
+                        </button>
+                        <button onclick="setQuestion('Quais são os principais assuntos no Router 12?')" class="p-4 bg-slate-700/30 hover:bg-slate-700/50 border border-slate-600/30 rounded-xl transition-all">
+                            <div class="text-sm font-medium text-white">Análise de Conversas</div>
+                            <div class="text-xs text-slate-400 mt-1">Digital - Assuntos</div>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -54,7 +74,7 @@
                 <div class="flex gap-3">
                     <textarea
                         id="question-input"
-                        placeholder="Pergunte sobre seus dados..."
+                        placeholder="Pergunte sobre vendas, funil, conversas, operações..."
                         class="flex-1 px-4 py-3 bg-slate-700/50 border border-slate-600/50 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 resize-none"
                         rows="2"
                     ></textarea>
@@ -68,6 +88,9 @@
                         </svg>
                     </button>
                 </div>
+                <p class="text-xs text-slate-500 mt-2 text-center">
+                    Conectado ao BigQuery cloud-macro · Dados atualizados a cada hora
+                </p>
             </div>
         </div>
     </div>
