@@ -1,9 +1,3 @@
-
-// ========================================
-// ARQUIVO 1: api/chat.js (ATUALIZADO COM INSTRUÇÕES COMPLETAS)
-// ========================================
-// Substitua o arquivo api/chat.js atual
-
 const { BigQuery } = require('@google-cloud/bigquery');
 
 let bigquery;
@@ -17,7 +11,6 @@ try {
   console.error('Erro ao inicializar BigQuery:', error);
 }
 
-// Ferramentas do BigQuery
 async function listDatasets() {
   const [datasets] = await bigquery.getDatasets();
   return datasets.map(dataset => dataset.id);
@@ -46,7 +39,6 @@ async function getTableSchema(datasetId, tableId) {
   }));
 }
 
-// System prompt completo do agente TIM B2C
 const SYSTEM_PROMPT = `================================================================================
 INSTRUÇÕES DO AGENTE — TIM B2C ULTRAFIBRA
 Agente de Análise de Dados · Macro
@@ -80,32 +72,15 @@ Canais de venda:
 - Chatbot (canal principal): fluxo automatizado via WhatsApp, organizado em
   Routers (ex: Router 2, Router 6, Router 12)
 - 0800: atendimento telefônico
-- Operação humana via WhatsApp, em três frentes:
-  · WhatsApp Abandono: recuperação de leads que abandonaram o Chatbot
-  · Reversão (BKO): leads cujo pedido foi negado por Crivo
-  · TCT: pós-venda, garantindo instalação da fibra
+- Operação humana via WhatsApp
 
 TIM B2C ULTRAFIBRA DEALER — o investimento em tráfego pago é da Macro.
 Canais de venda:
 - Chatbot: fluxo automatizado via WhatsApp
-- Carrinho: canal de vendas via carrinho online
-- 0800: atendimento telefônico
 - IA de Voz: IA que atua como vendedora via ligação telefônica
 - Operação humana
 
-3. MOTOR DE RISCO
-────────────────────────────────────────────────────────────────────────────────
-
-CHATBOT — DIGITAL E DEALER
-Acionado entre Pagamento e Agendamento. Três caminhos:
-- Barrado direto (não passa pelo quiz)
-- Aprovado direto (não passa pelo quiz)
-- Enviado para o quiz (3 perguntas → barrado ou aprovado)
-
-IA DE VOZ — DEALER
-Avalia antes da finalização. Sem quiz. Status: APROVADO, NEGADO ou SEM MOTOR.
-
-4. COMO CONSULTAR OS DADOS
+3. COMO CONSULTAR OS DADOS
 ────────────────────────────────────────────────────────────────────────────────
 
 REGRAS OBRIGATÓRIAS:
@@ -117,77 +92,40 @@ REGRAS OBRIGATÓRIAS:
        DATETIME(CURRENT_TIMESTAMP(), 'America/Sao_Paulo')
 - Prefira agregações no BigQuery — nunca traga dados brutos para calcular
 - Use LIMIT apenas em queries exploratórias — nunca em GROUP BY
-- Consulte schemas com get_table_schema antes de queries complexas
-- Use JOIN com auxiliares de etapas para análise de funil
+- Nunca exiba dados pessoais individuais (phone, cpf, nome, endereço)
 
-ABANDONO NO FUNIL:
-
-Chatbot Digital: diferença entre leads que chegaram à etapa atual e próxima.
-Use auxiliar: tim_b2c_auxiliares.ultrafibra_digital_etapas_funil
-
-Chatbot Dealer: mesma lógica.
-Use auxiliar: tim_b2c_auxiliares.ultrafibra_dealer_etapas_funil_chatbot
-
-IA de Voz: identificar última etapa por order_id, cruzar com auxiliar.
-Use auxiliar: tim_b2c_auxiliares.ultrafibra_dealer_funil_ia_voz
-
-5. PRIVACIDADE E SEGURANÇA
+4. FORMATO DE RESPOSTA
 ────────────────────────────────────────────────────────────────────────────────
 
-!! REGRA ABSOLUTA !!
-
-Você pode usar dados pessoais (identity, phone, cpf, cep, logradouro, bairro)
-internamente para calcular métricas agregadas. Porém, JAMAIS exiba valores
-individuais desses campos no chat.
-
-Se solicitado, informe educadamente que por política de privacidade não é
-possível exibir dados individuais, mas pode gerar análises agregadas.
-
-6. FORMATO DE RESPOSTA
-────────────────────────────────────────────────────────────────────────────────
-
-Os usuários são profissionais de negócio, não técnicos:
+SEMPRE responda em linguagem de negócio:
 
 - Seja direto — comece com a resposta principal
-- Use linguagem de negócio — nunca mencione colunas, tabelas ou SQL
+- Use linguagem de negócio — nunca mencione nomes de colunas ou tabelas
 - Formate números — separadores de milhar, % com uma casa decimal
 - Contextualize resultados — o que significa para o negócio
-- Use tabelas/listas para comparações
 - Informe período analisado
-- Destaque anomalias proativamente
-- Seja transparente sobre limitações
 
 ESTRUTURA:
 1. **Resumo Executivo** (2-3 linhas do insight principal)
-2. **Dados** (tabela ou lista formatada)
+2. **Dados** (formatados em tabela ou lista)
 3. **Query SQL** (em bloco de código, se relevante)
-4. **Recomendações** (próximos passos ou análises sugeridas)
+4. **Recomendações** (próximos passos)
 
-7. TABELAS PRINCIPAIS
+5. TABELAS PRINCIPAIS
 ────────────────────────────────────────────────────────────────────────────────
 
 DIGITAL:
-- tim_b2c.ultrafibra_digital_api_blip_funil_analitico (funil chatbot)
-- tim_b2c.ultrafibra_digital_conversas_threads (conversas brutas)
-- tim_b2c.ultrafibra_digital_conversas_threads_agente_analise (análise IA)
-- tim_b2c.ultrafibra_digital_ah_abandono_wpp (WhatsApp Abandono)
-- tim_b2c.ultrafibra_digital_ah_bko_wpp (Reversão)
-- tim_b2c.ultrafibra_digital_ah_tct (TCT)
+- cloud-macro.tim_b2c.ultrafibra_digital_api_blip_funil_analitico
+- cloud-macro.tim_b2c.ultrafibra_digital_conversas_threads
+- cloud-macro.tim_b2c.ultrafibra_digital_conversas_threads_agente_analise
 
 DEALER:
-- tim_b2c.ultrafibra_dealer_api_blip_funil_analitico (funil chatbot)
-- tim_b2c.ultrafibra_dealer_ia_voz_funil (IA de Voz)
+- cloud-macro.tim_b2c.ultrafibra_dealer_api_blip_funil_analitico
+- cloud-macro.tim_b2c.ultrafibra_dealer_ia_voz_funil
 
 AUXILIARES:
-- tim_b2c_auxiliares.ultrafibra_digital_etapas_funil
-- tim_b2c_auxiliares.ultrafibra_dealer_etapas_funil_chatbot
-- tim_b2c_auxiliares.ultrafibra_dealer_funil_ia_voz
-
-8. ESCOPO
-────────────────────────────────────────────────────────────────────────────────
-
-Você responde apenas sobre TIM B2C Ultrafibra Digital e Dealer. Se perguntarem
-sobre outros produtos/segmentos, informe educadamente que não está no seu escopo.
+- cloud-macro.tim_b2c_auxiliares.ultrafibra_digital_etapas_funil
+- cloud-macro.tim_b2c_auxiliares.ultrafibra_dealer_etapas_funil_chatbot
 
 ================================================================================`;
 
@@ -207,7 +145,7 @@ export default async function handler(req, res) {
   try {
     const { messages } = req.body;
 
-    // Chamar Claude com ferramentas
+    // Primeira chamada ao Claude
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -223,42 +161,39 @@ export default async function handler(req, res) {
         tools: [
           {
             name: 'list_datasets',
-            description: 'Lista todos os datasets disponíveis no BigQuery do projeto cloud-macro',
-            input_schema: {
-              type: 'object',
-              properties: {},
-            }
+            description: 'Lista todos os datasets disponíveis no BigQuery',
+            input_schema: { type: 'object', properties: {} }
           },
           {
             name: 'list_tables',
-            description: 'Lista todas as tabelas de um dataset específico',
+            description: 'Lista tabelas de um dataset',
             input_schema: {
               type: 'object',
               properties: {
-                dataset_id: { type: 'string', description: 'ID do dataset (ex: tim_b2c)' }
+                dataset_id: { type: 'string', description: 'ID do dataset' }
               },
               required: ['dataset_id']
             }
           },
           {
             name: 'get_table_schema',
-            description: 'Retorna o schema (colunas e tipos) de uma tabela específica',
+            description: 'Retorna schema de uma tabela',
             input_schema: {
               type: 'object',
               properties: {
-                dataset_id: { type: 'string', description: 'ID do dataset' },
-                table_id: { type: 'string', description: 'ID da tabela' }
+                dataset_id: { type: 'string' },
+                table_id: { type: 'string' }
               },
               required: ['dataset_id', 'table_id']
             }
           },
           {
             name: 'run_query',
-            description: 'Executa uma query SQL no BigQuery. SEMPRE filtre por data. Use agregações. Nunca SELECT *.',
+            description: 'Executa query SQL no BigQuery',
             input_schema: {
               type: 'object',
               properties: {
-                query: { type: 'string', description: 'Query SQL completa' }
+                query: { type: 'string', description: 'Query SQL' }
               },
               required: ['query']
             }
@@ -269,12 +204,13 @@ export default async function handler(req, res) {
 
     if (!response.ok) {
       const error = await response.text();
+      console.error('Claude API error:', error);
       return res.status(response.status).json({ error });
     }
 
     const data = await response.json();
 
-    // Se usou ferramentas, executar no BigQuery
+    // Se usou ferramentas, executar e continuar
     if (data.stop_reason === 'tool_use') {
       const toolUseBlocks = data.content.filter(block => block.type === 'tool_use');
       const toolResults = [];
@@ -283,23 +219,29 @@ export default async function handler(req, res) {
         let result;
         
         try {
+          console.log(`Executando ferramenta: ${toolUse.name}`);
+          
           if (toolUse.name === 'list_datasets') {
             const datasets = await listDatasets();
-            result = `Datasets disponíveis:\n${datasets.map(d => `- ${d}`).join('\n')}`;
+            result = `Datasets:\n${datasets.join('\n')}`;
           } 
           else if (toolUse.name === 'list_tables') {
             const tables = await listTables(toolUse.input.dataset_id);
-            result = `Tabelas no dataset ${toolUse.input.dataset_id}:\n${tables.map(t => `- ${t}`).join('\n')}`;
+            result = `Tabelas em ${toolUse.input.dataset_id}:\n${tables.join('\n')}`;
           } 
           else if (toolUse.name === 'get_table_schema') {
             const schema = await getTableSchema(toolUse.input.dataset_id, toolUse.input.table_id);
-            result = `Schema da tabela ${toolUse.input.dataset_id}.${toolUse.input.table_id}:\n${JSON.stringify(schema, null, 2)}`;
+            result = JSON.stringify(schema, null, 2);
           }
           else if (toolUse.name === 'run_query') {
+            console.log('Query SQL:', toolUse.input.query);
             const rows = await runQuery(toolUse.input.query);
-            result = `Resultados (${rows.length} linhas):\n${JSON.stringify(rows, null, 2)}`;
+            result = `Resultados (${rows.length} linhas):\n${JSON.stringify(rows.slice(0, 50), null, 2)}`;
           }
+          
+          console.log(`Resultado da ferramenta ${toolUse.name}:`, result.substring(0, 200));
         } catch (error) {
+          console.error(`Erro em ${toolUse.name}:`, error);
           result = `Erro ao executar ${toolUse.name}: ${error.message}`;
         }
 
@@ -310,7 +252,9 @@ export default async function handler(req, res) {
         });
       }
 
-      // Chamar Claude com os resultados
+      // Segunda chamada com resultados
+      console.log('Enviando resultados das ferramentas de volta ao Claude...');
+      
       const followUpResponse = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: {
@@ -330,13 +274,23 @@ export default async function handler(req, res) {
         }),
       });
 
+      if (!followUpResponse.ok) {
+        const error = await followUpResponse.text();
+        console.error('Follow-up error:', error);
+        return res.status(followUpResponse.status).json({ error });
+      }
+
       const followUpData = await followUpResponse.json();
+      console.log('Resposta final recebida');
+      
       return res.status(200).json(followUpData);
     }
 
-    res.status(200).json(data);
+    // Se não usou ferramentas, retorna direto
+    return res.status(200).json(data);
+    
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Handler error:', error);
     res.status(500).json({ error: error.message });
   }
 }
