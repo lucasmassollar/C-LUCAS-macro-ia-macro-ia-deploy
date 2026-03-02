@@ -1,3 +1,4 @@
+
 let messages = [];
 let isLoading = false;
 
@@ -19,16 +20,16 @@ function addMessage(role, content) {
     if (role === 'assistant') {
         // SQL blocks
         formattedContent = content.replace(/```sql\n([\s\S]*?)```/g, (match, code) => {
-            return `<div class="bg-slate-900/50 rounded-lg p-3 my-3 font-mono text-xs text-cyan-300 overflow-x-auto border border-slate-700">${escapeHtml(code.trim())}</div>`;
+            return `<div class="bg-gray-900 rounded-lg p-3 my-3 font-mono text-xs text-cyan-400 overflow-x-auto border border-gray-300">${escapeHtml(code.trim())}</div>`;
         });
         
         // Generic code blocks
         formattedContent = formattedContent.replace(/```([\s\S]*?)```/g, (match, code) => {
-            return `<div class="bg-slate-900/50 rounded-lg p-3 my-3 font-mono text-xs text-slate-300 overflow-x-auto border border-slate-700">${escapeHtml(code.trim())}</div>`;
+            return `<div class="bg-gray-900 rounded-lg p-3 my-3 font-mono text-xs text-gray-300 overflow-x-auto border border-gray-300">${escapeHtml(code.trim())}</div>`;
         });
 
         // Bold
-        formattedContent = formattedContent.replace(/\*\*(.*?)\*\*/g, '<strong class="text-white font-semibold">$1</strong>');
+        formattedContent = formattedContent.replace(/\*\*(.*?)\*\*/g, '<strong class="text-gray-900 font-semibold">$1</strong>');
         
         // Tables (Markdown style: | col1 | col2 |)
         const lines = formattedContent.split('\n');
@@ -42,7 +43,7 @@ function addMessage(role, content) {
             if (line.startsWith('|') && line.endsWith('|')) {
                 if (!inTable) {
                     inTable = true;
-                    tableHtml = '<table class="w-full my-3 text-sm border-collapse"><tbody>';
+                    tableHtml = '<table class="w-full my-3 text-sm border-collapse border border-gray-300"><tbody>';
                 }
                 
                 const cells = line.split('|').filter(cell => cell.trim());
@@ -51,7 +52,7 @@ function addMessage(role, content) {
                 if (!isHeader && !line.includes('---')) {
                     tableHtml += '<tr>';
                     cells.forEach(cell => {
-                        tableHtml += `<td class="border border-slate-600 px-3 py-2">${cell.trim()}</td>`;
+                        tableHtml += `<td class="border border-gray-300 px-3 py-2 bg-white">${cell.trim()}</td>`;
                     });
                     tableHtml += '</tr>';
                 }
@@ -81,20 +82,20 @@ function addMessage(role, content) {
         <div class="max-w-3xl ${role === 'user' ? 'ml-12' : 'mr-12'}">
             <div class="flex items-start gap-3 mb-1">
                 ${role === 'assistant' ? `
-                    <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <div class="w-8 h-8 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-lg flex items-center justify-center flex-shrink-0">
                         <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
                         </svg>
                     </div>
                 ` : ''}
                 <div class="flex-1 ${role === 'user' ? 'text-right' : ''}">
-                    <div class="text-xs text-slate-500 mb-1">
-                        ${role === 'user' ? 'Você' : 'Assistente de BI'}
-                    </div>
+                    ${role === 'assistant' ? `
+                        <div class="text-xs text-gray-500 mb-1">Analista de Dados</div>
+                    ` : ''}
                     <div class="rounded-2xl px-5 py-4 ${
                         role === 'user'
-                            ? 'bg-gradient-to-br from-blue-600 to-cyan-600 text-white'
-                            : 'bg-slate-700/50 text-slate-100 border border-slate-600/50'
+                            ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white inline-block'
+                            : 'bg-white text-gray-900 border border-gray-200 shadow-sm'
                     }">
                         ${role === 'user' 
                             ? `<div class="text-sm">${escapeHtml(content)}</div>`
@@ -102,11 +103,6 @@ function addMessage(role, content) {
                         }
                     </div>
                 </div>
-                ${role === 'user' ? `
-                    <div class="w-8 h-8 bg-slate-600 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <span class="text-xs font-medium text-white">VC</span>
-                    </div>
-                ` : ''}
             </div>
         </div>
     `;
@@ -133,15 +129,15 @@ function showLoading() {
     loadingDiv.className = 'flex justify-start';
     loadingDiv.innerHTML = `
         <div class="flex items-start gap-3">
-            <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
+            <div class="w-8 h-8 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-lg flex items-center justify-center">
                 <svg class="w-4 h-4 text-white animate-spin" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
             </div>
-            <div class="bg-slate-700/50 border border-slate-600/50 rounded-2xl px-5 py-4">
+            <div class="bg-white border border-gray-200 rounded-2xl px-5 py-4 shadow-sm">
                 <div class="flex items-center gap-2">
-                    <span class="text-sm text-slate-300">Analisando dados do BigQuery...</span>
+                    <span class="text-sm text-gray-600">Analisando dados do BigQuery...</span>
                 </div>
             </div>
         </div>
@@ -158,9 +154,9 @@ function hideLoading() {
 function showError(message) {
     const chatMessages = document.getElementById('chat-messages');
     const errorDiv = document.createElement('div');
-    errorDiv.className = 'p-4 bg-red-500/10 border border-red-500/30 rounded-xl';
+    errorDiv.className = 'p-4 bg-red-50 border border-red-200 rounded-xl';
     errorDiv.innerHTML = `
-        <div class="flex items-center gap-2 text-red-300 text-sm">
+        <div class="flex items-center gap-2 text-red-700 text-sm">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
