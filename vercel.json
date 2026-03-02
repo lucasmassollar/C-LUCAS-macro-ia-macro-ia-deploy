@@ -1,11 +1,8 @@
-// ========================================
-// ARQUIVO 4: vercel.json
-// ========================================
-// Configuração do Vercel
-// Salve como: vercel.json
-
 {
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/$1" }
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
+    }
   ]
 }
