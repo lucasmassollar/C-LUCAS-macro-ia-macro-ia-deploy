@@ -1,0 +1,81 @@
+{
+  "tabelas": {
+    "ultrafibra_digital_api_blip_funil_analitico": {
+      "dataset": "tim_b2c",
+      "descricao": "Funil analítico do Chatbot Digital. Cada linha = 1 lead (identity). Investimento em tráfego pago é da TIM.",
+      "colunas_chave": ["identity", "date", "hour", "router", "origem", "origem_agrupada", "cta"],
+      "etapas_funil": ["etapa_boas_vindas", "etapa_cep", "etapa_num_casa", "etapa_confirma_endereco", "etapa_exibe_planos", "etapa_email", "etapa_cpf", "etapa_nome", "etapa_nome_mae", "etapa_data_nascimento", "etapa_vencimento", "etapa_tipo_fatura", "etapa_data_de_agendamento_1", "etapa_opt_in", "etapa_finalizacao"],
+      "motor_risco": ["quiz_motor_de_risco_1", "quiz_motor_de_risco_2", "quiz_motor_de_risco_3", "retorno_api_motor_de_risco", "status_motor_de_risco", "fluxo_motor_de_risco"],
+      "dados_pessoais": ["identity", "phone", "cpf", "cep", "logradouro", "bairro"]
+    },
+    "ultrafibra_digital_conversas_threads": {
+      "dataset": "tim_b2c",
+      "descricao": "Conversas brutas do Chatbot Digital. Cada linha = 1 mensagem. Use id_conversa para cruzar com análise.",
+      "colunas_chave": ["id_conversa", "phone", "router", "data", "hora", "direction", "humano", "mensagem_bot", "mensagem_cliente"],
+      "dados_pessoais": ["phone"]
+    },
+    "ultrafibra_digital_conversas_threads_agente_analise": {
+      "dataset": "tim_b2c",
+      "descricao": "Análise de IA das conversas do Digital. Classificação de sentimento, interesse e assunto por conversa.",
+      "colunas_chave": ["id_conversa", "phone", "router", "data", "sentimento", "interesse_comercial", "assunto_agrupado", "assunto_detalhado"],
+      "valores_consultar_bq": ["sentimento", "interesse_comercial", "assunto_agrupado", "assunto_detalhado"],
+      "dados_pessoais": ["phone"]
+    },
+    "ultrafibra_digital_ah_abandono_wpp": {
+      "dataset": "tim_b2c",
+      "descricao": "Atendimento humano - WhatsApp Abandono. Operadores recuperam leads que abandonaram.",
+      "colunas_chave": ["agent_identity", "storage_date", "contagem", "fila_atendimento", "tags"]
+    },
+    "ultrafibra_digital_ah_bko_wpp": {
+      "dataset": "tim_b2c",
+      "descricao": "Atendimento humano - Reversão (BKO). Operadores solicitam novo CPF após negação no Crivo.",
+      "colunas_chave": ["agent_identity", "storage_date", "contagem", "fila_atendimento", "tags"]
+    },
+    "ultrafibra_digital_ah_tct": {
+      "dataset": "tim_b2c",
+      "descricao": "Atendimento humano - TCT (pós-venda). Garantem instalação da fibra após venda.",
+      "colunas_chave": ["agent_identity", "storage_date", "contagem", "fila_atendimento", "tags"]
+    },
+    "ultrafibra_dealer_api_blip_funil_analitico": {
+      "dataset": "tim_b2c",
+      "descricao": "Funil analítico do Chatbot Dealer. Investimento em tráfego pago é da Macro. Tem campo fluxo_ja_sou_cliente.",
+      "colunas_chave": ["identity", "date", "hour", "num_bot", "ddd", "fluxo_ja_sou_cliente"],
+      "etapas_funil": ["etapa_boas_vindas", "etapa_cep", "etapa_confirma_endereco", "etapa_exibe_planos", "etapa_cpf", "etapa_nome", "etapa_finalizacao"],
+      "motor_risco": ["quiz_motor_de_risco_1", "retorno_api_motor_de_risco", "status_motor_de_risco", "fluxo_motor_risco"],
+      "dados_pessoais": ["identity", "cpf"]
+    },
+    "ultrafibra_dealer_ia_voz_funil": {
+      "dataset": "tim_b2c",
+      "descricao": "IA de Voz Dealer. ATENÇÃO: cada lead tem MÚLTIPLOS registros (1 por etapa). Use order_id como identificador único.",
+      "colunas_chave": ["order_id", "step", "motor_de_risco", "init_date_process_data", "init_date_process_hora"],
+      "motor_risco_valores": ["APROVADO", "NEGADO", "SEM MOTOR"],
+      "dados_pessoais": ["telefone", "cpf", "nome", "email", "endereco_logradouro", "endereco_cep"]
+    }
+  },
+  "auxiliares": {
+    "ultrafibra_digital_etapas_funil": {
+      "dataset": "tim_b2c_auxiliares",
+      "descricao": "Ordem e nomes amigáveis das etapas do funil Digital. Cruzar por etapa_datalake.",
+      "colunas": ["ordem", "etapa_bot", "etapa_datalake"]
+    },
+    "ultrafibra_dealer_etapas_funil_chatbot": {
+      "dataset": "tim_b2c_auxiliares",
+      "descricao": "Ordem e nomes amigáveis do funil Chatbot Dealer. Cruzar por step.",
+      "colunas": ["step", "etapa", "ordem"]
+    },
+    "ultrafibra_dealer_funil_ia_voz": {
+      "dataset": "tim_b2c_auxiliares",
+      "descricao": "Ordem e nomes amigáveis do funil IA de Voz. Cruzar por etapa_datalake.",
+      "colunas": ["etapa_datalake", "etapa_funil", "ordem"]
+    }
+  },
+  "regras_importantes": [
+    "Nunca use SELECT * - selecione apenas colunas necessárias",
+    "Sempre filtre por date - padrão últimos 7 dias se não especificado",
+    "Fuso horário: CURRENT_DATE('America/Sao_Paulo')",
+    "Nunca exiba dados pessoais individuais - apenas agregações",
+    "Use LIMIT apenas em exploração - nunca em GROUP BY",
+    "Consulte valores distintos no BQ para campos de classificação",
+    "Use auxiliares para análise de funil (JOIN por ordem)"
+  ]
+}
