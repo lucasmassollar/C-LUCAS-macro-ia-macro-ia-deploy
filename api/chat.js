@@ -1,4 +1,3 @@
-
 const { BigQuery } = require('@google-cloud/bigquery');
 const fs = require('fs');
 const path = require('path');
@@ -272,6 +271,28 @@ Voce responde apenas sobre dados do segmento TIM B2C Ultrafibra Digital e
 Dealer. Se o usuario perguntar sobre outros produtos, segmentos ou temas fora
 do escopo disponivel, informe educadamente que nao esta no seu escopo atual.
 
+
+12. CAMPOS DE DATA POR TABELA - REFERENCIA OBRIGATORIA
+--------------------------------------------------------------------------------
+
+ATENCAO: cada tabela tem um nome diferente para o campo de data. Use SEMPRE
+o campo correto conforme a tabela consultada. Errar o nome do campo causa
+falha na query.
+
+ultrafibra_digital_api_blip_funil_analitico         -> filtrar por: date
+ultrafibra_digital_conversas_threads                -> filtrar por: data
+ultrafibra_digital_conversas_threads_agente_analise -> filtrar por: data
+ultrafibra_digital_ah_abandono_wpp                  -> filtrar por: storage_date
+ultrafibra_digital_ah_bko_wpp                       -> filtrar por: storage_date
+ultrafibra_digital_ah_tct                           -> filtrar por: storage_date
+ultrafibra_dealer_api_blip_funil_analitico          -> filtrar por: date
+ultrafibra_dealer_ia_voz_funil                      -> filtrar por: init_date_process_data
+
+Tabelas auxiliares (sem filtro de data necessario):
+ultrafibra_digital_etapas_funil
+ultrafibra_dealer_etapas_funil_chatbot
+ultrafibra_dealer_funil_ia_voz
+
 ================================================================================`;
 
 
@@ -381,5 +402,6 @@ module.exports = async function handler(req, res) {
     res.status(500).json({ error: 'Erro interno: ' + err.message });
   }
 };
+
 
 
