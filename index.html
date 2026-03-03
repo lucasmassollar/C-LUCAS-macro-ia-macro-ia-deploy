@@ -1,11 +1,10 @@
 
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Óraculo Insight · Macro</title>
+    <title>Oráculo Insight · Macro</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-white min-h-screen">
@@ -20,7 +19,7 @@
                         </svg>
                     </div>
                     <div>
-                        <h1 class="text-xl font-bold text-gray-900">Óraculo Insight</h1>
+                        <h1 class="text-xl font-bold text-gray-900">Oráculo Insight</h1>
                         <p class="text-xs text-gray-500">TIM B2C Ultrafibra · Macro</p>
                     </div>
                 </div>
@@ -38,31 +37,90 @@
                 <div id="welcome-screen" class="h-full flex flex-col items-center justify-center text-center">
                     <div class="w-20 h-20 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 rounded-2xl flex items-center justify-center mb-6">
                         <svg class="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                         </svg>
                     </div>
-                    <h2 class="text-2xl font-bold text-gray-900 mb-3">Óraculo Insight da Macro</h2>
-                    <p class="text-gray-600 mb-8 max-w-md">
-                        Especializado em TIM B2C Ultrafibra Digital e Dealer<br>
-                        Faça perguntas sobre dados de vendas, funil, conversas e operações
+                    <h2 class="text-3xl font-bold text-gray-900 mb-3">Oráculo Insight</h2>
+                    <p class="text-gray-600 mb-8 max-w-2xl text-lg">
+                        O copilot estratégico que transforma dados em insights acionáveis e decisões em tempo real.
                     </p>
-                    <div class="grid grid-cols-2 gap-3 w-full max-w-2xl text-left">
-                        <button onclick="setQuestion('Quais datasets temos disponíveis?')" class="p-4 bg-white hover:bg-gray-50 border border-gray-200 rounded-xl transition-all shadow-sm">
-                            <div class="text-sm font-medium text-gray-900">Explorar Dados</div>
-                            <div class="text-xs text-gray-500 mt-1">Ver datasets e tabelas</div>
-                        </button>
-                        <button onclick="setQuestion('Quantas conversas tivemos ontem no Router 6?')" class="p-4 bg-white hover:bg-gray-50 border border-gray-200 rounded-xl transition-all shadow-sm">
-                            <div class="text-sm font-medium text-gray-900">Volume de Conversas</div>
-                            <div class="text-xs text-gray-500 mt-1">Digital - por Router</div>
-                        </button>
-                        <button onclick="setQuestion('Onde temos mais abandono no funil do Chatbot Dealer?')" class="p-4 bg-white hover:bg-gray-50 border border-gray-200 rounded-xl transition-all shadow-sm">
-                            <div class="text-sm font-medium text-gray-900">Análise de Abandono</div>
-                            <div class="text-xs text-gray-500 mt-1">Dealer - Chatbot</div>
-                        </button>
-                        <button onclick="setQuestion('Quais são os principais assuntos no Router 12?')" class="p-4 bg-white hover:bg-gray-50 border border-gray-200 rounded-xl transition-all shadow-sm">
-                            <div class="text-sm font-medium text-gray-900">Análise de Conversas</div>
-                            <div class="text-xs text-gray-500 mt-1">Digital - Assuntos</div>
-                        </button>
+                    
+                    <!-- Principais Funcionalidades -->
+                    <div class="w-full max-w-3xl mb-8">
+                        <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">Principais Funcionalidades</h3>
+                        <div class="grid grid-cols-2 gap-3 text-left">
+                            <div class="flex items-start gap-2 p-3 bg-white rounded-lg border border-gray-200">
+                                <svg class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <span class="text-sm text-gray-700">Identifica gargalos e ofensores</span>
+                            </div>
+                            <div class="flex items-start gap-2 p-3 bg-white rounded-lg border border-gray-200">
+                                <svg class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <span class="text-sm text-gray-700">Analisa funil completo (conversa → pedido → input)</span>
+                            </div>
+                            <div class="flex items-start gap-2 p-3 bg-white rounded-lg border border-gray-200">
+                                <svg class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <span class="text-sm text-gray-700">Avalia abandono e retomadas</span>
+                            </div>
+                            <div class="flex items-start gap-2 p-3 bg-white rounded-lg border border-gray-200">
+                                <svg class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <span class="text-sm text-gray-700">Explora performance por canal (Digital vs Dealer)</span>
+                            </div>
+                            <div class="flex items-start gap-2 p-3 bg-white rounded-lg border border-gray-200">
+                                <svg class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <span class="text-sm text-gray-700">Analisa assuntos de conversa</span>
+                            </div>
+                            <div class="flex items-start gap-2 p-3 bg-white rounded-lg border border-gray-200">
+                                <svg class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <span class="text-sm text-gray-700">Mostra taxa de conversão por origem</span>
+                            </div>
+                            <div class="flex items-start gap-2 p-3 bg-white rounded-lg border border-gray-200">
+                                <svg class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <span class="text-sm text-gray-700">Permite explorar datasets e tabelas</span>
+                            </div>
+                            <div class="flex items-start gap-2 p-3 bg-white rounded-lg border border-gray-200">
+                                <svg class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <span class="text-sm text-gray-700">Responde perguntas estratégicas instantaneamente</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="w-full max-w-2xl">
+                        <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">Comece por aqui</h3>
+                        <div class="grid grid-cols-2 gap-3 text-left">
+                            <button onclick="setQuestion('Quais datasets temos disponíveis?')" class="p-4 bg-white hover:bg-gray-50 border border-gray-200 rounded-xl transition-all shadow-sm">
+                                <div class="text-sm font-medium text-gray-900">Explorar Dados</div>
+                                <div class="text-xs text-gray-500 mt-1">Ver datasets e tabelas</div>
+                            </button>
+                            <button onclick="setQuestion('Onde temos mais abandono no funil?')" class="p-4 bg-white hover:bg-gray-50 border border-gray-200 rounded-xl transition-all shadow-sm">
+                                <div class="text-sm font-medium text-gray-900">Gargalos do Funil</div>
+                                <div class="text-xs text-gray-500 mt-1">Identificar pontos críticos</div>
+                            </button>
+                            <button onclick="setQuestion('Qual a performance por canal hoje?')" class="p-4 bg-white hover:bg-gray-50 border border-gray-200 rounded-xl transition-all shadow-sm">
+                                <div class="text-sm font-medium text-gray-900">Performance por Canal</div>
+                                <div class="text-xs text-gray-500 mt-1">Digital vs Dealer</div>
+                            </button>
+                            <button onclick="setQuestion('Principais assuntos das conversas hoje?')" class="p-4 bg-white hover:bg-gray-50 border border-gray-200 rounded-xl transition-all shadow-sm">
+                                <div class="text-sm font-medium text-gray-900">Assuntos em Alta</div>
+                                <div class="text-xs text-gray-500 mt-1">O que os clientes falam</div>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -95,10 +153,6 @@
     <script src="app.js"></script>
 </body>
 </html>
-
-
-
-
 
 
 
