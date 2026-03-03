@@ -1,81 +1,252 @@
 {
-  "tabelas": {
-    "ultrafibra_digital_api_blip_funil_analitico": {
-      "dataset": "tim_b2c",
-      "descricao": "Funil analítico do Chatbot Digital. Cada linha = 1 lead (identity). Investimento em tráfego pago é da TIM.",
-      "colunas_chave": ["identity", "date", "hour", "router", "origem", "origem_agrupada", "cta"],
-      "etapas_funil": ["etapa_boas_vindas", "etapa_cep", "etapa_num_casa", "etapa_confirma_endereco", "etapa_exibe_planos", "etapa_email", "etapa_cpf", "etapa_nome", "etapa_nome_mae", "etapa_data_nascimento", "etapa_vencimento", "etapa_tipo_fatura", "etapa_data_de_agendamento_1", "etapa_opt_in", "etapa_finalizacao"],
-      "motor_risco": ["quiz_motor_de_risco_1", "quiz_motor_de_risco_2", "quiz_motor_de_risco_3", "retorno_api_motor_de_risco", "status_motor_de_risco", "fluxo_motor_de_risco"],
-      "dados_pessoais": ["identity", "phone", "cpf", "cep", "logradouro", "bairro"]
+  "titulo": "Dicionário de Dados — TIM B2C Ultrafibra Digital + Dealer",
+  "produtos": {
+    "TIM_B2C_ULTRAFIBRA_DIGITAL": {
+      "tabelas": {
+        "ultrafibra_digital_api_blip_funil_analitico": {
+          "nome_completo": "cloud-macro.tim_b2c.ultrafibra_digital_api_blip_funil_analitico",
+          "descricao": "Registra as interações dos leads com o Chatbot de vendas do Digital. Cada linha representa um lead identificado pelo seu telefone (identity). O investimento em tráfego pago nesse produto é da própria TIM.",
+          "granularidade": "1 linha = 1 lead (identity)",
+          "campos": [
+            { "campo": "identity", "tipo": "STRING", "descricao": "⚠️ DADO PESSOAL — Telefone do lead, único identificador disponível" },
+            { "campo": "date", "tipo": "DATE", "descricao": "Data da conversa" },
+            { "campo": "hour", "tipo": "INTEGER", "descricao": "Hora da conversa" },
+            { "campo": "tipo", "tipo": "STRING", "descricao": "Origem da conversa (detalhe)" },
+            { "campo": "num_bot", "tipo": "STRING", "descricao": "Número do Chatbot (relacionado ao campo tipo)" },
+            { "campo": "origem_agrupada", "tipo": "STRING", "descricao": "Origem agrupada da conversa" },
+            { "campo": "origem", "tipo": "STRING", "descricao": "Origem da conversa" },
+            { "campo": "cta", "tipo": "STRING", "descricao": "Origem detalhada da conversa" },
+            { "campo": "primeira_mensagem", "tipo": "STRING", "descricao": "Primeira mensagem enviada pelo lead no Chatbot" },
+            { "campo": "uf", "tipo": "STRING", "descricao": "Estado do lead" },
+            { "campo": "ddd", "tipo": "STRING", "descricao": "DDD do lead" },
+            { "campo": "etapa_boas_vindas", "tipo": "BOOLEAN", "descricao": "Início da conversa" },
+            { "campo": "etapa_cep", "tipo": "BOOLEAN", "descricao": "Lead visualizou a etapa de CEP" },
+            { "campo": "etapa_num_casa", "tipo": "BOOLEAN", "descricao": "Lead visualizou a etapa de Número da Casa" },
+            { "campo": "etapa_complemento", "tipo": "BOOLEAN", "descricao": "Lead visualizou a etapa de Complemento" },
+            { "campo": "etapa_confirma_endereco", "tipo": "BOOLEAN", "descricao": "Lead visualizou a etapa de Confirmação de Endereço" },
+            { "campo": "etapa_exibe_planos", "tipo": "BOOLEAN", "descricao": "Lead visualizou a etapa de Planos" },
+            { "campo": "etapa_email", "tipo": "BOOLEAN", "descricao": "Lead visualizou a etapa de E-mail" },
+            { "campo": "etapa_cpf", "tipo": "BOOLEAN", "descricao": "Lead visualizou a etapa de CPF" },
+            { "campo": "etapa_nome", "tipo": "BOOLEAN", "descricao": "Lead visualizou a etapa de Nome" },
+            { "campo": "etapa_nome_mae", "tipo": "BOOLEAN", "descricao": "Lead visualizou a etapa de Nome da Mãe" },
+            { "campo": "etapa_data_nascimento", "tipo": "BOOLEAN", "descricao": "Lead visualizou a etapa de Data de Nascimento" },
+            { "campo": "etapa_vencimento", "tipo": "BOOLEAN", "descricao": "Lead visualizou a etapa de Vencimento" },
+            { "campo": "etapa_tipo_fatura", "tipo": "BOOLEAN", "descricao": "Lead visualizou a etapa de Tipo de Fatura" },
+            { "campo": "etapa_data_de_agendamento_1", "tipo": "BOOLEAN", "descricao": "Lead visualizou a 1ª opção de data de agendamento" },
+            { "campo": "etapa_data_de_agendamento_2", "tipo": "BOOLEAN", "descricao": "Lead visualizou a 2ª opção de data de agendamento" },
+            { "campo": "etapa_data_de_agendamento_3", "tipo": "BOOLEAN", "descricao": "Lead visualizou a 3ª opção de data de agendamento" },
+            { "campo": "etapa_opt_in", "tipo": "BOOLEAN", "descricao": "Lead visualizou a etapa de aceite dos termos" },
+            { "campo": "etapa_finalizacao", "tipo": "BOOLEAN", "descricao": "Lead finalizou um pedido com sucesso" },
+            { "campo": "quiz_motor_de_risco_1", "tipo": "STRING", "descricao": "Lead visualizou a 1ª pergunta do quiz do Motor de Risco" },
+            { "campo": "quiz_motor_de_risco_2", "tipo": "STRING", "descricao": "Lead visualizou a 2ª pergunta do quiz do Motor de Risco" },
+            { "campo": "quiz_motor_de_risco_3", "tipo": "STRING", "descricao": "Lead visualizou a 3ª pergunta do quiz do Motor de Risco" },
+            { "campo": "retorno_api_motor_de_risco", "tipo": "STRING", "descricao": "Retorno da API do Motor de Risco para o lead" },
+            { "campo": "status_motor_de_risco", "tipo": "STRING", "descricao": "Destino final do lead após o Motor de Risco" },
+            { "campo": "fluxo_motor_de_risco", "tipo": "STRING", "descricao": "Indica se o lead é elegível ao Motor de Risco" },
+            { "campo": "etapa_retomada", "tipo": "BOOLEAN", "descricao": "Lead retomou a navegação após abandono" },
+            { "campo": "etapa_abandono_1", "tipo": "BOOLEAN", "descricao": "Lead recebeu a 1ª mensagem de recuperação de abandono" },
+            { "campo": "etapa_abandono_2", "tipo": "BOOLEAN", "descricao": "Lead recebeu a 2ª mensagem de recuperação de abandono" },
+            { "campo": "etapa_abandono_3", "tipo": "BOOLEAN", "descricao": "Lead recebeu a 3ª mensagem de recuperação de abandono" },
+            { "campo": "cpf_ou_cnpj", "tipo": "STRING", "descricao": "Indica se o lead informou CPF ou CNPJ" },
+            { "campo": "api_slot_status", "tipo": "STRING", "descricao": "Indica se o lead é elegível para API Slot" },
+            { "campo": "api_slot_falha_detalhe", "tipo": "STRING", "descricao": "Retorno da API Slot para o lead" },
+            { "campo": "teste_ab", "tipo": "STRING", "descricao": "Versão do teste A/B em que o lead está navegando" },
+            { "campo": "cep", "tipo": "STRING", "descricao": "⚠️ DADO PESSOAL — usar apenas para métricas agregadas" },
+            { "campo": "logradouro", "tipo": "STRING", "descricao": "⚠️ DADO PESSOAL — usar apenas para métricas agregadas" },
+            { "campo": "bairro", "tipo": "STRING", "descricao": "⚠️ DADO PESSOAL — usar apenas para métricas agregadas" },
+            { "campo": "cpf", "tipo": "STRING", "descricao": "⚠️ DADO PESSOAL — usar apenas para métricas agregadas" },
+            { "campo": "fatura_cliente", "tipo": "STRING", "descricao": "Forma de pagamento escolhida pelo lead" }
+          ],
+          "campos_irrelevantes": ["utm_term_ajustada", "identificador_pedido", "sac"]
+        },
+        "ultrafibra_digital_etapas_funil": {
+          "nome_completo": "cloud-macro.tim_b2c_auxiliares.ultrafibra_digital_etapas_funil",
+          "descricao": "Define a ordem sequencial das etapas do Chatbot Digital e os nomes amigáveis de cada uma. Deve ser usada sempre que a análise envolver o funil do Chatbot Digital.",
+          "granularidade": "1 linha = 1 etapa do funil",
+          "campos": [
+            { "campo": "ordem", "tipo": "STRING", "descricao": "Ordem numérica da etapa no funil" },
+            { "campo": "etapa_bot", "tipo": "STRING", "descricao": "Nome amigável da etapa (linguagem de negócio)" },
+            { "campo": "etapa_datalake", "tipo": "STRING", "descricao": "Nome da coluna correspondente na tabela principal" }
+          ]
+        },
+        "ultrafibra_digital_conversas_threads": {
+          "nome_completo": "cloud-macro.tim_b2c.ultrafibra_digital_conversas_threads",
+          "descricao": "Traz o conteúdo completo das conversas dos leads com o Chatbot Digital, mensagem a mensagem. É a base mais granular do produto — cada linha representa uma mensagem individual trocada entre o lead e o Chatbot (ou um humano da operação). Permite entender se os leads estão de fato interessados em contratar ou abordando outros assuntos, analisar o sentimento ao longo da conversa e auditar interações específicas. Use id_conversa para cruzar com a tabela de análise do agente de IA.",
+          "granularidade": "1 linha = 1 mensagem",
+          "campos": [
+            { "campo": "id_conversa", "tipo": "STRING", "descricao": "Identificador da conversa — chave de junção com a tabela de análise" },
+            { "campo": "phone", "tipo": "STRING", "descricao": "⚠️ DADO PESSOAL — Telefone do lead" },
+            { "campo": "router", "tipo": "STRING", "descricao": "Router (Chatbot específico) com o qual o lead está interagindo. Ex: Router 2, Router 6, Router 12" },
+            { "campo": "data_hora", "tipo": "DATETIME", "descricao": "Data e hora da conversa" },
+            { "campo": "data", "tipo": "DATE", "descricao": "Data da conversa" },
+            { "campo": "hora", "tipo": "INTEGER", "descricao": "Hora da conversa" },
+            { "campo": "direction", "tipo": "STRING", "descricao": "Indica quem enviou a mensagem: received = lead enviou / sent = Chatbot enviou" },
+            { "campo": "humano", "tipo": "STRING", "descricao": "Indica se a mensagem foi enviada pelo Chatbot ou por um humano da operação da Macro" },
+            { "campo": "mensagem_bot", "tipo": "STRING", "descricao": "Conteúdo da mensagem enviada pelo Chatbot" },
+            { "campo": "mensagem_cliente", "tipo": "STRING", "descricao": "Conteúdo da mensagem enviada pelo lead" }
+          ],
+          "campos_irrelevantes": ["date"]
+        },
+        "ultrafibra_digital_conversas_threads_agente_analise": {
+          "nome_completo": "cloud-macro.tim_b2c.ultrafibra_digital_conversas_threads_agente_analise",
+          "descricao": "Traz as classificações geradas por um agente de IA (construído via N8N) a partir do conteúdo bruto das conversas. Cada conversa recebe uma classificação de sentimento, interesse comercial e assunto. É a tabela ideal para análises agregadas de comportamento e intenção dos leads por Router. Os valores possíveis de cada campo de classificação devem ser consultados diretamente no BigQuery antes de filtrar. Use id_conversa para cruzar com a tabela de conversas brutas quando necessário.",
+          "granularidade": "1 linha = 1 conversa classificada",
+          "campos": [
+            { "campo": "id_conversa", "tipo": "STRING", "descricao": "Identificador da conversa — chave de junção com a tabela de conversas" },
+            { "campo": "phone", "tipo": "STRING", "descricao": "⚠️ DADO PESSOAL — Telefone do lead" },
+            { "campo": "router", "tipo": "STRING", "descricao": "Router (Chatbot específico) com o qual o lead interagiu. Ex: Router 2, Router 6, Router 12" },
+            { "campo": "data", "tipo": "DATE", "descricao": "Data da conversa" },
+            { "campo": "hora", "tipo": "INTEGER", "descricao": "Hora da conversa" },
+            { "campo": "data_hora", "tipo": "DATETIME", "descricao": "Data e hora da conversa" },
+            { "campo": "sentimento", "tipo": "STRING", "descricao": "Sentimento do lead durante a conversa — consultar valores distintos no BigQuery" },
+            { "campo": "interesse_comercial", "tipo": "STRING", "descricao": "Interesse comercial do lead — consultar valores distintos no BigQuery" },
+            { "campo": "assunto_agrupado", "tipo": "STRING", "descricao": "Assunto agrupado da conversa — consultar valores distintos no BigQuery" },
+            { "campo": "assunto_detalhado", "tipo": "STRING", "descricao": "Assunto detalhado da conversa — consultar valores distintos no BigQuery" }
+          ],
+          "campos_irrelevantes": ["processed_at"]
+        },
+        "ultrafibra_digital_ah_abandono_wpp": {
+          "nome_completo": "cloud-macro.tim_b2c.ultrafibra_digital_ah_abandono_wpp",
+          "descricao": "Registra as interações dos consultores do WhatsApp Abandono com leads que abandonaram o fluxo do Chatbot e não retornaram nem após as mensagens automáticas de recuperação. O consultor atua manualmente para tentar fechar o pedido.",
+          "granularidade": "1 linha = 1 interação de operador",
+          "campos": [
+            { "campo": "agent_identity", "tipo": "STRING", "descricao": "Identificador do operador do WhatsApp Abandono" },
+            { "campo": "storage_date", "tipo": "DATE", "descricao": "Data da interação do operador com o lead" },
+            { "campo": "contagem", "tipo": "INTEGER", "descricao": "Quantidade de interações" },
+            { "campo": "fila_atendimento", "tipo": "STRING", "descricao": "Fila de atendimento na qual o operador interagiu com o lead" },
+            { "campo": "tags", "tipo": "STRING", "descricao": "Tabulação usada pelo operador para descrever a interação com o lead" }
+          ]
+        },
+        "ultrafibra_digital_ah_bko_wpp": {
+          "nome_completo": "cloud-macro.tim_b2c.ultrafibra_digital_ah_bko_wpp",
+          "descricao": "Registra as interações dos Backoffices de Reversão com leads cujo pedido foi negado por Crivo (CPF não aprovado). O backoffice solicita um novo CPF ao lead para tentar viabilizar o pedido. Se o novo CPF passar no Crivo, o pedido poderá evoluir para venda e instalação.",
+          "granularidade": "1 linha = 1 interação de operador",
+          "campos": [
+            { "campo": "agent_identity", "tipo": "STRING", "descricao": "Identificador do operador de Reversão" },
+            { "campo": "storage_date", "tipo": "DATE", "descricao": "Data da interação do operador com o lead" },
+            { "campo": "contagem", "tipo": "INTEGER", "descricao": "Quantidade de interações" },
+            { "campo": "fila_atendimento", "tipo": "STRING", "descricao": "Fila de atendimento na qual o operador interagiu com o lead" },
+            { "campo": "tags", "tipo": "STRING", "descricao": "Tabulação usada pelo operador para descrever a interação com o lead" }
+          ]
+        },
+        "ultrafibra_digital_ah_tct": {
+          "nome_completo": "cloud-macro.tim_b2c.ultrafibra_digital_ah_tct",
+          "descricao": "Registra as interações dos Backoffices de TCT com leads que já geraram uma venda e estão no processo de instalação da fibra. O TCT atua no pós-venda para remover entraves e garantir que a instalação aconteça (ex: técnico não compareceu, cliente cancelou antes da instalação, problemas no endereço).",
+          "granularidade": "1 linha = 1 interação de operador",
+          "campos": [
+            { "campo": "agent_identity", "tipo": "STRING", "descricao": "Identificador do operador de TCT" },
+            { "campo": "storage_date", "tipo": "DATE", "descricao": "Data da interação do operador com o lead" },
+            { "campo": "contagem", "tipo": "INTEGER", "descricao": "Quantidade de interações" },
+            { "campo": "fila_atendimento", "tipo": "STRING", "descricao": "Fila de atendimento na qual o operador interagiu com o lead" },
+            { "campo": "tags", "tipo": "STRING", "descricao": "Tabulação usada pelo operador para descrever a interação com o lead" }
+          ]
+        }
+      }
     },
-    "ultrafibra_digital_conversas_threads": {
-      "dataset": "tim_b2c",
-      "descricao": "Conversas brutas do Chatbot Digital. Cada linha = 1 mensagem. Use id_conversa para cruzar com análise.",
-      "colunas_chave": ["id_conversa", "phone", "router", "data", "hora", "direction", "humano", "mensagem_bot", "mensagem_cliente"],
-      "dados_pessoais": ["phone"]
-    },
-    "ultrafibra_digital_conversas_threads_agente_analise": {
-      "dataset": "tim_b2c",
-      "descricao": "Análise de IA das conversas do Digital. Classificação de sentimento, interesse e assunto por conversa.",
-      "colunas_chave": ["id_conversa", "phone", "router", "data", "sentimento", "interesse_comercial", "assunto_agrupado", "assunto_detalhado"],
-      "valores_consultar_bq": ["sentimento", "interesse_comercial", "assunto_agrupado", "assunto_detalhado"],
-      "dados_pessoais": ["phone"]
-    },
-    "ultrafibra_digital_ah_abandono_wpp": {
-      "dataset": "tim_b2c",
-      "descricao": "Atendimento humano - WhatsApp Abandono. Operadores recuperam leads que abandonaram.",
-      "colunas_chave": ["agent_identity", "storage_date", "contagem", "fila_atendimento", "tags"]
-    },
-    "ultrafibra_digital_ah_bko_wpp": {
-      "dataset": "tim_b2c",
-      "descricao": "Atendimento humano - Reversão (BKO). Operadores solicitam novo CPF após negação no Crivo.",
-      "colunas_chave": ["agent_identity", "storage_date", "contagem", "fila_atendimento", "tags"]
-    },
-    "ultrafibra_digital_ah_tct": {
-      "dataset": "tim_b2c",
-      "descricao": "Atendimento humano - TCT (pós-venda). Garantem instalação da fibra após venda.",
-      "colunas_chave": ["agent_identity", "storage_date", "contagem", "fila_atendimento", "tags"]
-    },
-    "ultrafibra_dealer_api_blip_funil_analitico": {
-      "dataset": "tim_b2c",
-      "descricao": "Funil analítico do Chatbot Dealer. Investimento em tráfego pago é da Macro. Tem campo fluxo_ja_sou_cliente.",
-      "colunas_chave": ["identity", "date", "hour", "num_bot", "ddd", "fluxo_ja_sou_cliente"],
-      "etapas_funil": ["etapa_boas_vindas", "etapa_cep", "etapa_confirma_endereco", "etapa_exibe_planos", "etapa_cpf", "etapa_nome", "etapa_finalizacao"],
-      "motor_risco": ["quiz_motor_de_risco_1", "retorno_api_motor_de_risco", "status_motor_de_risco", "fluxo_motor_risco"],
-      "dados_pessoais": ["identity", "cpf"]
-    },
-    "ultrafibra_dealer_ia_voz_funil": {
-      "dataset": "tim_b2c",
-      "descricao": "IA de Voz Dealer. ATENÇÃO: cada lead tem MÚLTIPLOS registros (1 por etapa). Use order_id como identificador único.",
-      "colunas_chave": ["order_id", "step", "motor_de_risco", "init_date_process_data", "init_date_process_hora"],
-      "motor_risco_valores": ["APROVADO", "NEGADO", "SEM MOTOR"],
-      "dados_pessoais": ["telefone", "cpf", "nome", "email", "endereco_logradouro", "endereco_cep"]
+    "TIM_B2C_ULTRAFIBRA_DEALER": {
+      "tabelas": {
+        "ultrafibra_dealer_api_blip_funil_analitico": {
+          "nome_completo": "cloud-macro.tim_b2c.ultrafibra_dealer_api_blip_funil_analitico",
+          "descricao": "Registra as interações dos leads com o Chatbot de vendas do Dealer. Cada linha representa um lead identificado pelo seu telefone (identity). O investimento em tráfego pago nesse produto é da Macro. Diferente do Digital, essa tabela não possui campos de origem (origem, origem_agrupada, cta), e possui o campo fluxo_ja_sou_cliente para identificar leads que já são clientes TIM.",
+          "granularidade": "1 linha = 1 lead (identity)",
+          "campos": [
+            { "campo": "identity", "tipo": "STRING", "descricao": "⚠️ DADO PESSOAL — Telefone do lead, único identificador disponível" },
+            { "campo": "date", "tipo": "DATE", "descricao": "Data da conversa" },
+            { "campo": "hour", "tipo": "INTEGER", "descricao": "Hora da conversa" },
+            { "campo": "num_bot", "tipo": "STRING", "descricao": "Número do Chatbot (relacionado à origem da conversa)" },
+            { "campo": "ddd", "tipo": "STRING", "descricao": "DDD do lead" },
+            { "campo": "etapa_boas_vindas", "tipo": "BOOLEAN", "descricao": "Início da conversa" },
+            { "campo": "etapa_cep", "tipo": "BOOLEAN", "descricao": "Lead visualizou a etapa de CEP" },
+            { "campo": "etapa_num_casa", "tipo": "BOOLEAN", "descricao": "Lead visualizou a etapa de Número da Casa" },
+            { "campo": "etapa_complemento", "tipo": "BOOLEAN", "descricao": "Lead visualizou a etapa de Complemento" },
+            { "campo": "etapa_confirma_endereco", "tipo": "BOOLEAN", "descricao": "Lead visualizou a etapa de Confirmação de Endereço" },
+            { "campo": "etapa_exibe_planos", "tipo": "BOOLEAN", "descricao": "Lead visualizou a etapa de Planos" },
+            { "campo": "etapa_email", "tipo": "BOOLEAN", "descricao": "Lead visualizou a etapa de E-mail" },
+            { "campo": "etapa_cpf", "tipo": "BOOLEAN", "descricao": "Lead visualizou a etapa de CPF" },
+            { "campo": "etapa_nome", "tipo": "BOOLEAN", "descricao": "Lead visualizou a etapa de Nome" },
+            { "campo": "etapa_nome_mae", "tipo": "BOOLEAN", "descricao": "Lead visualizou a etapa de Nome da Mãe" },
+            { "campo": "etapa_data_nascimento", "tipo": "BOOLEAN", "descricao": "Lead visualizou a etapa de Data de Nascimento" },
+            { "campo": "etapa_vencimento", "tipo": "BOOLEAN", "descricao": "Lead visualizou a etapa de Vencimento" },
+            { "campo": "etapa_tipo_fatura", "tipo": "BOOLEAN", "descricao": "Lead visualizou a etapa de Tipo de Fatura" },
+            { "campo": "etapa_data_de_agendamento_1", "tipo": "BOOLEAN", "descricao": "Lead visualizou a 1ª opção de data de agendamento" },
+            { "campo": "etapa_data_de_agendamento_2", "tipo": "BOOLEAN", "descricao": "Lead visualizou a 2ª opção de data de agendamento" },
+            { "campo": "etapa_data_de_agendamento_3", "tipo": "BOOLEAN", "descricao": "Lead visualizou a 3ª opção de data de agendamento" },
+            { "campo": "etapa_opt_in", "tipo": "BOOLEAN", "descricao": "Lead visualizou a etapa de aceite dos termos" },
+            { "campo": "etapa_finalizacao", "tipo": "BOOLEAN", "descricao": "Lead finalizou um pedido com sucesso" },
+            { "campo": "quiz_motor_de_risco_1", "tipo": "STRING", "descricao": "Lead visualizou a 1ª pergunta do quiz do Motor de Risco" },
+            { "campo": "quiz_motor_de_risco_2", "tipo": "STRING", "descricao": "Lead visualizou a 2ª pergunta do quiz do Motor de Risco" },
+            { "campo": "quiz_motor_de_risco_3", "tipo": "STRING", "descricao": "Lead visualizou a 3ª pergunta do quiz do Motor de Risco" },
+            { "campo": "retorno_api_motor_de_risco", "tipo": "STRING", "descricao": "Retorno da API do Motor de Risco para o lead" },
+            { "campo": "status_motor_de_risco", "tipo": "STRING", "descricao": "Destino final do lead após o Motor de Risco" },
+            { "campo": "fluxo_motor_risco", "tipo": "STRING", "descricao": "Indica se o lead é elegível ao Motor de Risco (atenção: nome do campo difere do Digital — aqui é fluxo_motor_risco, sem _de_)" },
+            { "campo": "retomada", "tipo": "STRING", "descricao": "Indica se o lead retomou a navegação após abandono" },
+            { "campo": "etapa_abandono_1", "tipo": "STRING", "descricao": "Lead recebeu a 1ª mensagem de recuperação de abandono" },
+            { "campo": "etapa_abandono_2", "tipo": "STRING", "descricao": "Lead recebeu a 2ª mensagem de recuperação de abandono" },
+            { "campo": "etapa_abandono_3", "tipo": "STRING", "descricao": "Lead recebeu a 3ª mensagem de recuperação de abandono" },
+            { "campo": "fluxo_ja_sou_cliente", "tipo": "STRING", "descricao": "Indica se o lead sinalizou que já é cliente TIM no topo do funil, antes de informar o CEP. Permite distinguir leads interessados em nova contratação de leads que buscam atendimento ou suporte" }
+          ],
+          "campos_irrelevantes": ["utm_term_ajustada", "step_abandono", "sac", "erro_saudacao_inicial"]
+        },
+        "ultrafibra_dealer_etapas_funil_chatbot": {
+          "nome_completo": "cloud-macro.tim_b2c_auxiliares.ultrafibra_dealer_etapas_funil_chatbot",
+          "descricao": "Define a ordem sequencial das etapas do Chatbot Dealer e os nomes amigáveis de cada uma. Deve ser cruzada com a tabela ultrafibra_dealer_api_blip_funil_analitico ao analisar o funil do Chatbot Dealer.",
+          "granularidade": "1 linha = 1 etapa do funil",
+          "campos": [
+            { "campo": "step", "tipo": "STRING", "descricao": "Nome da etapa no Datalake (equivalente a etapa_datalake do Digital)" },
+            { "campo": "etapa", "tipo": "STRING", "descricao": "Nome amigável da etapa (linguagem de negócio)" },
+            { "campo": "ordem", "tipo": "STRING", "descricao": "Ordem numérica da etapa no funil" }
+          ]
+        },
+        "ultrafibra_dealer_ia_voz_funil": {
+          "nome_completo": "cloud-macro.tim_b2c.ultrafibra_dealer_ia_voz_funil",
+          "descricao": "Registra as interações dos leads com a IA de Voz do Dealer, que atua via 0800 (ligação telefônica) como vendedora. Diferente do Chatbot, cada lead pode ter múltiplos registros na tabela — um para cada etapa percorrida na conversa. Por isso, é necessário cruzar com a auxiliar de etapas para entender até onde o lead chegou e onde ocorreu o abandono. O identificador único de uma conversa é order_id.",
+          "granularidade": "1 linha = 1 etapa percorrida por lead (múltiplos registros por order_id)",
+          "atencao": "Cada lead tem MÚLTIPLOS registros — identifique a última etapa atingida por order_id antes de calcular abandono",
+          "campos": [
+            { "campo": "order_id", "tipo": "STRING", "descricao": "Identificador único da conversa do lead com a IA de Voz" },
+            { "campo": "num_msg", "tipo": "INTEGER", "descricao": "Quantidade de mensagens na conversa" },
+            { "campo": "project_id", "tipo": "STRING", "descricao": "Id do projeto da IA de Voz" },
+            { "campo": "project_type", "tipo": "STRING", "descricao": "Tipo do projeto (IA de Voz)" },
+            { "campo": "product_type", "tipo": "STRING", "descricao": "Tipo do produto vendido (Fibra)" },
+            { "campo": "init_date_process_data", "tipo": "DATE", "descricao": "Data de início da conversa" },
+            { "campo": "init_date_process_hora", "tipo": "INTEGER", "descricao": "Hora de início da conversa" },
+            { "campo": "step", "tipo": "STRING", "descricao": "Nome da etapa da conversa — deve ser cruzado com a auxiliar de etapas para obter ordem e nome amigável. Quando recebe o valor etapa_finalizacao, significa que o lead finalizou um pedido" },
+            { "campo": "motor_de_risco", "tipo": "STRING", "descricao": "Status do Motor de Risco: APROVADO = lead seguiu com a finalização / NEGADO = lead barrado pelo Motor de Risco / SEM MOTOR = lead não passou pela avaliação do Motor" },
+            { "campo": "endereco_bairro", "tipo": "STRING", "descricao": "⚠️ DADO PESSOAL — usar apenas para métricas agregadas" },
+            { "campo": "endereco_cep", "tipo": "STRING", "descricao": "⚠️ DADO PESSOAL — usar apenas para métricas agregadas" },
+            { "campo": "endereco_cidade", "tipo": "STRING", "descricao": "⚠️ DADO PESSOAL — usar apenas para métricas agregadas" },
+            { "campo": "endereco_complemento", "tipo": "STRING", "descricao": "⚠️ DADO PESSOAL — usar apenas para métricas agregadas" },
+            { "campo": "endereco_estado", "tipo": "STRING", "descricao": "⚠️ DADO PESSOAL — usar apenas para métricas agregadas" },
+            { "campo": "endereco_logradouro", "tipo": "STRING", "descricao": "⚠️ DADO PESSOAL — usar apenas para métricas agregadas" },
+            { "campo": "endereco_numimovel", "tipo": "STRING", "descricao": "⚠️ DADO PESSOAL — usar apenas para métricas agregadas" },
+            { "campo": "cpf", "tipo": "STRING", "descricao": "⚠️ DADO PESSOAL — usar apenas para métricas agregadas" },
+            { "campo": "nome", "tipo": "STRING", "descricao": "⚠️ DADO PESSOAL — usar apenas para métricas agregadas" },
+            { "campo": "telefone", "tipo": "STRING", "descricao": "⚠️ DADO PESSOAL — usar apenas para métricas agregadas" },
+            { "campo": "nome_mae", "tipo": "STRING", "descricao": "⚠️ DADO PESSOAL — usar apenas para métricas agregadas" },
+            { "campo": "data_nascimento", "tipo": "STRING", "descricao": "⚠️ DADO PESSOAL — usar apenas para métricas agregadas" },
+            { "campo": "sexo", "tipo": "STRING", "descricao": "⚠️ DADO PESSOAL — usar apenas para métricas agregadas" },
+            { "campo": "email", "tipo": "STRING", "descricao": "⚠️ DADO PESSOAL — usar apenas para métricas agregadas" },
+            { "campo": "sku", "tipo": "STRING", "descricao": "Id do produto escolhido pelo lead" },
+            { "campo": "forma_pagamento", "tipo": "STRING", "descricao": "Forma de pagamento escolhida pelo lead" },
+            { "campo": "dados_bancarios_agencia", "tipo": "STRING", "descricao": "Agência bancária do lead (quando forma de pagamento é Débito Automático)" },
+            { "campo": "dados_bancarios_banco", "tipo": "STRING", "descricao": "Nome do banco do lead (quando forma de pagamento é Débito Automático)" },
+            { "campo": "fatura_diavencimento", "tipo": "INTEGER", "descricao": "Dia de vencimento da fatura escolhido pelo lead" },
+            { "campo": "data_instalacao", "tipo": "STRING", "descricao": "Data de instalação escolhida pelo lead" }
+          ],
+          "campos_irrelevantes": ["sale_type", "send_crm", "status", "fatura_tipofatura", "utm_source", "utm_medium", "conversation_id", "utm_referrer", "value"]
+        },
+        "ultrafibra_dealer_funil_ia_voz": {
+          "nome_completo": "cloud-macro.tim_b2c_auxiliares.ultrafibra_dealer_funil_ia_voz",
+          "descricao": "Define a ordem sequencial das etapas da IA de Voz e os nomes amigáveis de cada uma. Deve ser cruzada com a tabela ultrafibra_dealer_ia_voz_funil usando o campo step (datalake) para obter a ordem correta e os nomes amigáveis nas análises de funil.",
+          "granularidade": "1 linha = 1 etapa do funil",
+          "campos": [
+            { "campo": "etapa_datalake", "tipo": "STRING", "descricao": "Nome da etapa no Datalake — chave de junção com o campo step da tabela principal" },
+            { "campo": "etapa_funil", "tipo": "STRING", "descricao": "Nome amigável da etapa (linguagem de negócio)" },
+            { "campo": "ordem", "tipo": "STRING", "descricao": "Ordem numérica da etapa no funil" }
+          ],
+          "campos_irrelevantes": ["etapa_api_manager"]
+        }
+      }
     }
-  },
-  "auxiliares": {
-    "ultrafibra_digital_etapas_funil": {
-      "dataset": "tim_b2c_auxiliares",
-      "descricao": "Ordem e nomes amigáveis das etapas do funil Digital. Cruzar por etapa_datalake.",
-      "colunas": ["ordem", "etapa_bot", "etapa_datalake"]
-    },
-    "ultrafibra_dealer_etapas_funil_chatbot": {
-      "dataset": "tim_b2c_auxiliares",
-      "descricao": "Ordem e nomes amigáveis do funil Chatbot Dealer. Cruzar por step.",
-      "colunas": ["step", "etapa", "ordem"]
-    },
-    "ultrafibra_dealer_funil_ia_voz": {
-      "dataset": "tim_b2c_auxiliares",
-      "descricao": "Ordem e nomes amigáveis do funil IA de Voz. Cruzar por etapa_datalake.",
-      "colunas": ["etapa_datalake", "etapa_funil", "ordem"]
-    }
-  },
-  "regras_importantes": [
-    "Nunca use SELECT * - selecione apenas colunas necessárias",
-    "Sempre filtre por date - padrão últimos 7 dias se não especificado",
-    "Fuso horário: CURRENT_DATE('America/Sao_Paulo')",
-    "Nunca exiba dados pessoais individuais - apenas agregações",
-    "Use LIMIT apenas em exploração - nunca em GROUP BY",
-    "Consulte valores distintos no BQ para campos de classificação",
-    "Use auxiliares para análise de funil (JOIN por ordem)"
-  ]
+  }
 }
