@@ -1,11 +1,7 @@
 
-import { BigQuery } from '@google-cloud/bigquery';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const { BigQuery } = require('@google-cloud/bigquery');
+const fs = require('fs');
+const path = require('path');
 
 // Carregar dicionário de dados
 let DICIONARIO = '';
@@ -322,7 +318,7 @@ function extractSQL(text) {
   return match ? match[1].trim() : null;
 }
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -433,4 +429,5 @@ export default async function handler(req, res) {
     res.status(500).json({ error: `Erro interno: ${error.message}` });
   }
 }
+
 
