@@ -1,4 +1,3 @@
-
 const { BigQuery } = require('@google-cloud/bigquery');
 
 let bigquery;
@@ -383,6 +382,8 @@ export default async function handler(req, res) {
   try {
     const { messages } = req.body;
 
+    console.log('System prompt length:', SYSTEM_PROMPT.length, 'characters');
+    
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -424,8 +425,11 @@ export default async function handler(req, res) {
     });
 
     if (!response.ok) {
-      console.error('Erro API:', response.status);
-      return res.status(response.status).json({ error: 'Erro na API' });
+      const errorText = await response.text();
+      console.error('Erro API:', response.status, errorText);
+      return res.status(response.status).json({ 
+        error: `Erro ${response.status}: ${errorText.substring(0, 200)}` 
+      });
     }
 
     const data = await response.json();
@@ -509,8 +513,7 @@ export default async function handler(req, res) {
     return res.status(200).json(followUpData);
     
   } catch (error) {
-    console.error('ERRO:', error);
-    res.status(500).json({ error: error.message });
+    console.error('ERRO GERAL:', error.message, error.stack);
+    res.status(500).json({ error: `Erro interno: ${error.message}` });
   }
 }
-
