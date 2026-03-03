@@ -1,12 +1,16 @@
 
-const { BigQuery } = require('@google-cloud/bigquery');
-const fs = require('fs');
-const path = require('path');
+import { BigQuery } from '@google-cloud/bigquery';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Carregar dicionário de dados
 let DICIONARIO = '';
 try {
-  const dicionarioPath = path.join(process.cwd(), 'data', 'dicionario.json');
+  const dicionarioPath = path.join(__dirname, '..', 'data', 'dicionario.json');
   const dicionarioRaw = fs.readFileSync(dicionarioPath, 'utf8');
   DICIONARIO = JSON.stringify(JSON.parse(dicionarioRaw), null, 2);
 } catch (error) {
@@ -429,3 +433,4 @@ export default async function handler(req, res) {
     res.status(500).json({ error: `Erro interno: ${error.message}` });
   }
 }
+
