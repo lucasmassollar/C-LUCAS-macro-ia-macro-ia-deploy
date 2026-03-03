@@ -90,7 +90,7 @@ function addMessage(role, content) {
                 ` : ''}
                 <div class="flex-1 ${role === 'user' ? 'text-right' : ''}">
                     ${role === 'assistant' ? `
-                        <div class="text-xs text-gray-500 mb-1">Óraculo Insight</div>
+                        <div class="text-xs text-gray-500 mb-1">Oráculo Insight</div>
                     ` : ''}
                     <div class="rounded-2xl px-5 py-4 ${
                         role === 'user'
@@ -233,4 +233,5 @@ document.getElementById('question-input').addEventListener('keypress', (e) => {
         sendMessage();
     }
 });
+
 
