@@ -309,7 +309,26 @@ module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  var systemContent = SYSTEM_PROMPT + '\n\n================================================================================\nDICIONARIO DE DADOS\n================================================================================\n\n' + DICIONARIO;
+  // Injetar data atual no prompt (fuso America/Sao_Paulo)
+  var now = new Date();
+  var formatter = new Intl.DateTimeFormat('pt-BR', {
+    timeZone: 'America/Sao_Paulo',
+    day: '2-digit', month: '2-digit', year: 'numeric',
+    weekday: 'long'
+  });
+  var dataHoje = formatter.format(now);
+
+  var ontem = new Date(now);
+  ontem.setDate(ontem.getDate() - 1);
+  var dataOntem = new Intl.DateTimeFormat('pt-BR', {
+    timeZone: 'America/Sao_Paulo',
+    day: '2-digit', month: '2-digit', year: 'numeric',
+    weekday: 'long'
+  }).format(ontem);
+
+  var dataContexto = '\n\n================================================================================\nDATA ATUAL\n================================================================================\n\nHoje e: ' + dataHoje + '\nOntem foi: ' + dataOntem + '\n\nSempre use essas datas ao mencionar periodos na sua resposta. NUNCA informe uma data diferente dessas quando se referir a hoje ou ontem.';
+
+  var systemContent = SYSTEM_PROMPT + dataContexto + '\n\n================================================================================\nDICIONARIO DE DADOS\n================================================================================\n\n' + DICIONARIO;
 
   try {
     var body = req.body;
@@ -402,6 +421,7 @@ module.exports = async function handler(req, res) {
     res.status(500).json({ error: 'Erro interno: ' + err.message });
   }
 };
+
 
 
 
