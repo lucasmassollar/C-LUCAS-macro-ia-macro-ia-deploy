@@ -386,8 +386,51 @@ module.exports = async function handler(req, res) {
       rows = await runQuery(sqlQuery);
       console.log('Retornou ' + rows.length + ' linhas');
     } catch (sqlErr) {
-      console.error('Erro SQL:', sqlErr);
-      return res.status(200).json({ content: [{ type: 'text', text: 'Erro ao executar a consulta: ' + sqlErr.message }] });
+      console.error('Erro SQL (tentativa 1):', sqlErr.message);
+
+      // Devolve o erro ao Claude para ele corrigir o SQL automaticamente
+      var retryResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + process.env.OPENROUTER_API_KEY,
+          'HTTP-Referer': 'https://vercel.app',
+          'X-Title': 'Oraculo Insight'
+        },
+        body: JSON.stringify({
+          model: 'anthropic/claude-sonnet-4',
+          messages: buildMessages(systemContent, messages).concat([
+            { role: 'assistant', content: assistantMessage },
+            { role: 'user', content: 'A query retornou o seguinte erro do BigQuery:\n\n' + sqlErr.message + '\n\nCorrija o SQL e tente novamente.' }
+          ]),
+          max_tokens: 4000,
+          temperature: 0.7
+        })
+      });
+
+      if (!retryResponse.ok) {
+        return res.status(200).json({ content: [{ type: 'text', text: 'Erro ao executar a consulta: ' + sqlErr.message }] });
+      }
+
+      var retryData = await retryResponse.json();
+      var retryMessage = (retryData.choices && retryData.choices[0] && retryData.choices[0].message) ? retryData.choices[0].message.content : '';
+      var retrySql = extractSQL(retryMessage);
+
+      if (!retrySql) {
+        // Claude nao conseguiu corrigir, entrega a resposta dele como texto
+        return res.status(200).json({ content: [{ type: 'text', text: retryMessage || 'Erro ao executar a consulta: ' + sqlErr.message }] });
+      }
+
+      console.log('Executando SQL corrigido:', retrySql.substring(0, 150));
+      try {
+        rows = await runQuery(retrySql);
+        console.log('Retornou ' + rows.length + ' linhas (apos correcao)');
+        sqlQuery = retrySql;
+        assistantMessage = retryMessage;
+      } catch (sqlErr2) {
+        console.error('Erro SQL (tentativa 2):', sqlErr2.message);
+        return res.status(200).json({ content: [{ type: 'text', text: 'Nao consegui executar a consulta apos duas tentativas. Erro: ' + sqlErr2.message }] });
+      }
     }
 
     // --- SEGUNDA CHAMADA: com streaming para a analise final ---
@@ -471,6 +514,7 @@ module.exports = async function handler(req, res) {
     }
   }
 };
+
 
 
 
