@@ -1,5 +1,4 @@
-
-let let messages = [];
+let messages = [];
 let isLoading = false;
 
 function setQuestion(text) {
@@ -309,12 +308,21 @@ async function sendMessage() {
         // --- RESPOSTA JSON NORMAL (sem SQL, resposta direta) ---
         } else {
             const data = await response.json();
-            const textBlocks = data.content.filter(block => block.type === 'text');
-            const content = textBlocks.map(block => block.text).join('\n\n');
+            let content = '';
+            if (Array.isArray(data.content)) {
+                content = data.content
+                    .filter(block => block.type === 'text')
+                    .map(block => block.text)
+                    .join('\n\n');
+            } else if (typeof data.content === 'string') {
+                content = data.content;
+            } else if (data.error) {
+                throw new Error(data.error);
+            }
 
             if (content.trim()) {
                 addMessage('assistant', content);
-                messages.push({ role: 'assistant', content: data.content });
+                messages.push({ role: 'assistant', content: content });
             } else {
                 throw new Error('Resposta vazia do assistente');
             }
@@ -342,7 +350,7 @@ document.getElementById('question-input').addEventListener('keypress', (e) => {
         sendMessage();
     }
 });
-});
+
 
 
 
