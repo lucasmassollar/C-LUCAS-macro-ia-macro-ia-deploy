@@ -1,5 +1,5 @@
 
-let messages = [];
+let let messages = [];
 let isLoading = false;
 
 function setQuestion(text) {
@@ -18,64 +18,7 @@ function addMessage(role, content) {
     // Formatar markdown
     let formattedContent = content;
     if (role === 'assistant') {
-        // SQL blocks
-        formattedContent = content.replace(/```sql\n([\s\S]*?)```/g, (match, code) => {
-            return `<div class="bg-gray-900 rounded-lg p-3 my-3 font-mono text-xs text-cyan-400 overflow-x-auto border border-gray-300">${escapeHtml(code.trim())}</div>`;
-        });
-        
-        // Generic code blocks
-        formattedContent = formattedContent.replace(/```([\s\S]*?)```/g, (match, code) => {
-            return `<div class="bg-gray-900 rounded-lg p-3 my-3 font-mono text-xs text-gray-300 overflow-x-auto border border-gray-300">${escapeHtml(code.trim())}</div>`;
-        });
-
-        // Bold
-        formattedContent = formattedContent.replace(/\*\*(.*?)\*\*/g, '<strong class="text-gray-900 font-semibold">$1</strong>');
-        
-        // Tables (Markdown style: | col1 | col2 |)
-        const lines = formattedContent.split('\n');
-        let inTable = false;
-        let tableHtml = '';
-        let newContent = '';
-        
-        for (let i = 0; i < lines.length; i++) {
-            const line = lines[i].trim();
-            
-            if (line.startsWith('|') && line.endsWith('|')) {
-                if (!inTable) {
-                    inTable = true;
-                    tableHtml = '<table class="w-full my-3 text-sm border-collapse border border-gray-300"><tbody>';
-                }
-                
-                const cells = line.split('|').filter(cell => cell.trim());
-                const isHeader = i < lines.length - 1 && lines[i + 1].includes('---');
-                
-                if (!isHeader && !line.includes('---')) {
-                    tableHtml += '<tr>';
-                    cells.forEach(cell => {
-                        tableHtml += `<td class="border border-gray-300 px-3 py-2 bg-white">${cell.trim()}</td>`;
-                    });
-                    tableHtml += '</tr>';
-                }
-            } else {
-                if (inTable) {
-                    tableHtml += '</tbody></table>';
-                    newContent += tableHtml;
-                    tableHtml = '';
-                    inTable = false;
-                }
-                newContent += line + '\n';
-            }
-        }
-        
-        if (inTable) {
-            tableHtml += '</tbody></table>';
-            newContent += tableHtml;
-        }
-        
-        formattedContent = newContent || formattedContent;
-        
-        // Line breaks
-        formattedContent = formattedContent.replace(/\n/g, '<br>');
+        formattedContent = formatAssistantContent(content);
     }
     
     messageDiv.innerHTML = `
@@ -99,7 +42,7 @@ function addMessage(role, content) {
                     }">
                         ${role === 'user' 
                             ? `<div class="text-sm">${escapeHtml(content)}</div>`
-                            : `<div class="text-sm leading-relaxed">${formattedContent}</div>`
+                            : `<div class="text-sm leading-relaxed assistant-content">${formattedContent}</div>`
                         }
                     </div>
                 </div>
@@ -109,6 +52,127 @@ function addMessage(role, content) {
     
     chatMessages.appendChild(messageDiv);
     chatMessages.scrollTop = chatMessages.scrollHeight;
+    return messageDiv;
+}
+
+// Cria uma bolha de assistente vazia que sera preenchida pelo stream
+function addStreamingMessage() {
+    const welcomeScreen = document.getElementById('welcome-screen');
+    if (welcomeScreen) welcomeScreen.remove();
+
+    const chatMessages = document.getElementById('chat-messages');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'flex justify-start';
+    messageDiv.id = 'streaming-message';
+
+    messageDiv.innerHTML = `
+        <div class="max-w-3xl mr-12">
+            <div class="flex items-start gap-3 mb-1">
+                <div class="w-8 h-8 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                </div>
+                <div class="flex-1">
+                    <div class="text-xs text-gray-500 mb-1">Oráculo Insight</div>
+                    <div class="rounded-2xl px-5 py-4 bg-white text-gray-900 border border-gray-200 shadow-sm">
+                        <div class="text-sm leading-relaxed assistant-content" id="streaming-content"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    chatMessages.appendChild(messageDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    return messageDiv;
+}
+
+// Acumula texto raw e re-renderiza o markdown a cada chunk
+function updateStreamingContent(rawText) {
+    const container = document.getElementById('streaming-content');
+    if (container) {
+        container.innerHTML = formatAssistantContent(rawText);
+        const chatMessages = document.getElementById('chat-messages');
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+}
+
+function finalizeStreamingMessage(rawText) {
+    const streamingMsg = document.getElementById('streaming-message');
+    if (streamingMsg) {
+        streamingMsg.removeAttribute('id');
+        const contentEl = streamingMsg.querySelector('.assistant-content');
+        if (contentEl) {
+            contentEl.removeAttribute('id');
+            contentEl.innerHTML = formatAssistantContent(rawText);
+        }
+    }
+}
+
+function formatAssistantContent(content) {
+    let formatted = content;
+
+    // SQL blocks
+    formatted = formatted.replace(/```sql\n([\s\S]*?)```/g, (match, code) => {
+        return `<div class="bg-gray-900 rounded-lg p-3 my-3 font-mono text-xs text-cyan-400 overflow-x-auto border border-gray-300">${escapeHtml(code.trim())}</div>`;
+    });
+
+    // Generic code blocks
+    formatted = formatted.replace(/```([\s\S]*?)```/g, (match, code) => {
+        return `<div class="bg-gray-900 rounded-lg p-3 my-3 font-mono text-xs text-gray-300 overflow-x-auto border border-gray-300">${escapeHtml(code.trim())}</div>`;
+    });
+
+    // Bold
+    formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong class="text-gray-900 font-semibold">$1</strong>');
+
+    // Tables (Markdown style: | col1 | col2 |)
+    const lines = formatted.split('\n');
+    let inTable = false;
+    let tableHtml = '';
+    let newContent = '';
+
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+
+        if (line.startsWith('|') && line.endsWith('|')) {
+            if (!inTable) {
+                inTable = true;
+                tableHtml = '<table class="w-full my-3 text-sm border-collapse border border-gray-300"><tbody>';
+            }
+
+            const cells = line.split('|').filter(cell => cell.trim());
+            const isHeader = i < lines.length - 1 && lines[i + 1].includes('---');
+
+            if (!isHeader && !line.includes('---')) {
+                tableHtml += '<tr>';
+                cells.forEach(cell => {
+                    tableHtml += `<td class="border border-gray-300 px-3 py-2 bg-white">${cell.trim()}</td>`;
+                });
+                tableHtml += '</tr>';
+            }
+        } else {
+            if (inTable) {
+                tableHtml += '</tbody></table>';
+                newContent += tableHtml;
+                tableHtml = '';
+                inTable = false;
+            }
+            newContent += line + '\n';
+        }
+    }
+
+    if (inTable) {
+        tableHtml += '</tbody></table>';
+        newContent += tableHtml;
+    }
+
+    formatted = newContent || formatted;
+
+    // Line breaks
+    formatted = formatted.replace(/\n/g, '<br>');
+
+    return formatted;
 }
 
 function escapeHtml(text) {
@@ -189,9 +253,7 @@ async function sendMessage() {
         const response = await fetch('/api/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                messages: messages
-            })
+            body: JSON.stringify({ messages: messages })
         });
 
         hideLoading();
@@ -201,21 +263,68 @@ async function sendMessage() {
             throw new Error(errorData.error || `Erro ${response.status}`);
         }
 
-        const data = await response.json();
-        
-        // Extrair texto da resposta
-        const textBlocks = data.content.filter(block => block.type === 'text');
-        const content = textBlocks.map(block => block.text).join('\n\n');
-        
-        if (content.trim()) {
-            addMessage('assistant', content);
-            messages.push({ role: 'assistant', content: data.content });
+        const contentType = response.headers.get('content-type') || '';
+
+        // --- RESPOSTA EM STREAM (segunda chamada: analise com dados do BQ) ---
+        if (contentType.includes('text/event-stream')) {
+            addStreamingMessage();
+
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let buffer = '';
+            let fullText = '';
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+                buffer += decoder.decode(value, { stream: true });
+                const lines = buffer.split('\n');
+                buffer = lines.pop();
+
+                for (const line of lines) {
+                    const trimmed = line.trim();
+                    if (!trimmed || trimmed === 'data: [DONE]') continue;
+                    if (!trimmed.startsWith('data: ')) continue;
+
+                    try {
+                        const parsed = JSON.parse(trimmed.slice(6));
+                        if (parsed.error) throw new Error(parsed.error);
+                        if (parsed.text) {
+                            fullText += parsed.text;
+                            updateStreamingContent(fullText);
+                        }
+                    } catch (e) {
+                        if (e.message && !e.message.includes('JSON')) throw e;
+                    }
+                }
+            }
+
+            finalizeStreamingMessage(fullText);
+
+            if (fullText.trim()) {
+                messages.push({ role: 'assistant', content: fullText });
+            }
+
+        // --- RESPOSTA JSON NORMAL (sem SQL, resposta direta) ---
         } else {
-            throw new Error('Resposta vazia do assistente');
+            const data = await response.json();
+            const textBlocks = data.content.filter(block => block.type === 'text');
+            const content = textBlocks.map(block => block.text).join('\n\n');
+
+            if (content.trim()) {
+                addMessage('assistant', content);
+                messages.push({ role: 'assistant', content: data.content });
+            } else {
+                throw new Error('Resposta vazia do assistente');
+            }
         }
-        
+
     } catch (error) {
         hideLoading();
+        // Remove bolha de stream incompleta se existir
+        const streamingMsg = document.getElementById('streaming-message');
+        if (streamingMsg) streamingMsg.remove();
         console.error('Error:', error);
         showError(error.message || 'Erro ao processar sua solicitação');
     } finally {
@@ -233,6 +342,8 @@ document.getElementById('question-input').addEventListener('keypress', (e) => {
         sendMessage();
     }
 });
+});
+
 
 
 
