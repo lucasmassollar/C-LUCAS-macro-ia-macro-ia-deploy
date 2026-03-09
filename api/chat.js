@@ -301,6 +301,17 @@ function extractSQL(text) {
   return match ? match[1].trim() : null;
 }
 
+function buildMessages(systemContent, messages) {
+  return [{ role: 'system', content: systemContent }].concat(
+    messages.map(function(m) {
+      return {
+        role: m.role,
+        content: typeof m.content === 'string' ? m.content : JSON.stringify(m.content)
+      };
+    })
+  );
+}
+
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -334,6 +345,7 @@ module.exports = async function handler(req, res) {
     var body = req.body;
     var messages = body.messages;
 
+    // --- PRIMEIRA CHAMADA: sem streaming (precisa do resultado completo para checar SQL) ---
     var response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -344,14 +356,7 @@ module.exports = async function handler(req, res) {
       },
       body: JSON.stringify({
         model: 'anthropic/claude-sonnet-4',
-        messages: [{ role: 'system', content: systemContent }].concat(
-          messages.map(function(m) {
-            return {
-              role: m.role,
-              content: typeof m.content === 'string' ? m.content : JSON.stringify(m.content)
-            };
-          })
-        ),
+        messages: buildMessages(systemContent, messages),
         max_tokens: 4000,
         temperature: 0.7
       })
@@ -368,59 +373,105 @@ module.exports = async function handler(req, res) {
 
     var sqlQuery = extractSQL(assistantMessage);
 
-    if (sqlQuery) {
-      console.log('Executando SQL:', sqlQuery.substring(0, 150));
-      try {
-        var rows = await runQuery(sqlQuery);
-        console.log('Retornou ' + rows.length + ' linhas');
+    // --- SE NAO TEM SQL: resposta simples, sem streaming necessario ---
+    if (!sqlQuery) {
+      return res.status(200).json({ content: [{ type: 'text', text: assistantMessage }] });
+    }
 
-        var followUpResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + process.env.OPENROUTER_API_KEY,
-            'HTTP-Referer': 'https://vercel.app',
-            'X-Title': 'Oraculo Insight'
-          },
-          body: JSON.stringify({
-            model: 'anthropic/claude-sonnet-4',
-            messages: [{ role: 'system', content: systemContent }].concat(
-              messages.map(function(m) {
-                return {
-                  role: m.role,
-                  content: typeof m.content === 'string' ? m.content : JSON.stringify(m.content)
-                };
-              })
-            ).concat([
-              { role: 'assistant', content: assistantMessage },
-              { role: 'user', content: 'Dados da query:\n' + JSON.stringify(rows.slice(0, 100), null, 2) + '\n\nAgora analise esses dados e responda de forma executiva.' }
-            ]),
-            max_tokens: 4000,
-            temperature: 0.7
-          })
-        });
+    // --- TEM SQL: executa no BigQuery ---
+    console.log('Executando SQL:', sqlQuery.substring(0, 150));
 
-        if (!followUpResponse.ok) {
-          return res.status(200).json({ content: [{ type: 'text', text: 'Query executada. Retornou ' + rows.length + ' linhas:\n\n' + JSON.stringify(rows.slice(0, 10), null, 2) }] });
+    var rows;
+    try {
+      rows = await runQuery(sqlQuery);
+      console.log('Retornou ' + rows.length + ' linhas');
+    } catch (sqlErr) {
+      console.error('Erro SQL:', sqlErr);
+      return res.status(200).json({ content: [{ type: 'text', text: 'Erro ao executar a consulta: ' + sqlErr.message }] });
+    }
+
+    // --- SEGUNDA CHAMADA: com streaming para a analise final ---
+    var streamMessages = buildMessages(systemContent, messages).concat([
+      { role: 'assistant', content: assistantMessage },
+      { role: 'user', content: 'Dados da query:\n' + JSON.stringify(rows.slice(0, 100), null, 2) + '\n\nAgora analise esses dados e responda de forma executiva.' }
+    ]);
+
+    var streamResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + process.env.OPENROUTER_API_KEY,
+        'HTTP-Referer': 'https://vercel.app',
+        'X-Title': 'Oraculo Insight'
+      },
+      body: JSON.stringify({
+        model: 'anthropic/claude-sonnet-4',
+        messages: streamMessages,
+        max_tokens: 4000,
+        temperature: 0.7,
+        stream: true
+      })
+    });
+
+    if (!streamResponse.ok) {
+      var streamErrText = await streamResponse.text();
+      console.error('Erro stream OpenRouter:', streamResponse.status, streamErrText);
+      return res.status(500).json({ error: 'Erro ao iniciar stream: ' + streamErrText.substring(0, 200) });
+    }
+
+    // Configurar headers para Server-Sent Events
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.setHeader('X-Accel-Buffering', 'no');
+
+    // Ler o stream chunk a chunk e repassar para o cliente
+    var reader = streamResponse.body.getReader();
+    var decoder = new TextDecoder();
+    var buffer = '';
+
+    while (true) {
+      var chunk = await reader.read();
+      if (chunk.done) break;
+
+      buffer += decoder.decode(chunk.value, { stream: true });
+      var lines = buffer.split('\n');
+      buffer = lines.pop(); // guarda linha incompleta para o proximo ciclo
+
+      for (var i = 0; i < lines.length; i++) {
+        var line = lines[i].trim();
+        if (!line || line === 'data: [DONE]') continue;
+        if (!line.startsWith('data: ')) continue;
+
+        try {
+          var parsed = JSON.parse(line.slice(6));
+          var delta = parsed.choices && parsed.choices[0] && parsed.choices[0].delta;
+          if (delta && delta.content) {
+            // Envia cada fragmento de texto como SSE
+            res.write('data: ' + JSON.stringify({ text: delta.content }) + '\n\n');
+          }
+        } catch (e) {
+          // linha malformada, ignora
         }
-
-        var followUpData = await followUpResponse.json();
-        var finalMessage = (followUpData.choices && followUpData.choices[0] && followUpData.choices[0].message) ? followUpData.choices[0].message.content : '';
-        return res.status(200).json({ content: [{ type: 'text', text: finalMessage }] });
-
-      } catch (sqlErr) {
-        console.error('Erro SQL:', sqlErr);
-        return res.status(200).json({ content: [{ type: 'text', text: 'Erro ao executar query: ' + sqlErr.message + '\n\nQuery:\n' + sqlQuery }] });
       }
     }
 
-    return res.status(200).json({ content: [{ type: 'text', text: assistantMessage }] });
+    // Sinaliza fim do stream
+    res.write('data: [DONE]\n\n');
+    res.end();
 
   } catch (err) {
     console.error('ERRO GERAL:', err.message);
-    res.status(500).json({ error: 'Erro interno: ' + err.message });
+    // Se o stream ja comecou, nao da pra mandar JSON de erro
+    if (!res.headersSent) {
+      res.status(500).json({ error: 'Erro interno: ' + err.message });
+    } else {
+      res.write('data: ' + JSON.stringify({ error: err.message }) + '\n\n');
+      res.end();
+    }
   }
 };
+
 
 
 
